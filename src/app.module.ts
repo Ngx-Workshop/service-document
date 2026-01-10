@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ExampleMongodbDocModule } from './example-crud/example-crud.module';
+import { NavigationModule } from './navigation/navigation.module';
+import { WorkshopModule } from './workshop-document/workshop-document.module';
 
 const DB_IMPORTS =
   process.env.GENERATE_OPENAPI === 'true'
@@ -22,7 +23,8 @@ const DB_IMPORTS =
       isGlobal: true,
     }),
     ...DB_IMPORTS,
-    ExampleMongodbDocModule,
+    NavigationModule,
+    WorkshopModule,
   ],
   controllers: [],
   providers: [],

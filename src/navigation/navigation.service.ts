@@ -1,0 +1,295 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+
+import { WorkshopDocumentDoc } from '../workshop-document/schemas/workshop-document.schema';
+import { WorkshopDocumentService } from '../workshop-document/workshop-document.service';
+
+import {
+  WorkshopDocumentDto,
+  WorkshopDocumentIdentifierDto,
+} from 'src/workshop-document/dto/create.dto';
+import {
+  CreateWorkshopDto,
+  SectionDto,
+  SectionsMapDto,
+  WorkshopDto,
+} from './dto/create.dto';
+import { UpdateWorkshopDto } from './dto/update.dto';
+import { Section, SectionDocumentDoc } from './schemas/section.schema';
+import {
+  TWorkshopDocument,
+  WorkshopDoc,
+  toSpinalCase,
+} from './schemas/workshop.schema';
+
+@Injectable()
+export class NavigationService {
+  constructor(
+    @InjectModel(Section.name) private sectionModel: Model<SectionDocumentDoc>,
+    @InjectModel(WorkshopDoc.name)
+    private workshopModel: Model<TWorkshopDocument>,
+    private workshopDocumentService: WorkshopDocumentService
+  ) {}
+
+  async findAllSections(): Promise<SectionsMapDto> {
+    const sections = await this.sectionModel.find().lean().exec();
+    const sectionsMap = sections.reduce<Record<string, SectionDto>>(
+      (acc, cur) => {
+        const section: SectionDto = {
+          ...cur,
+          _id: cur._id.toString(),
+        };
+        return { ...acc, [section._id]: section };
+      },
+      {}
+    );
+
+    return { sections: sectionsMap };
+  }
+
+  async findAllWorkshopsInSection(section: string): Promise<WorkshopDto[]> {
+    const workshops = await this.workshopModel
+      .find({ sectionId: section })
+      .sort({ sortId: 1 })
+      .exec();
+
+    return workshops.map((workshop) => this.toWorkshopDto(workshop));
+  }
+
+  async createWorkshop(workshop: CreateWorkshopDto): Promise<WorkshopDto> {
+    const newWorkshop = await this.workshopModel.create(workshop);
+    const workshopDocument =
+      await this.workshopDocumentService.createWorkshopDocument({
+        workshopGroupId: newWorkshop.workshopDocumentGroupId,
+      });
+    const workshopDocumentId = this.toWorkshopDocumentId(workshopDocument);
+
+    const updatedWorkshop = await this.workshopModel.findByIdAndUpdate(
+      newWorkshop._id,
+      {
+        workshopDocuments: [
+          {
+            _id: workshopDocumentId,
+            name: workshopDocument.name,
+            sortId: workshop.sortId ?? 0,
+          },
+        ],
+        workshopDocumentsLastUpdated: new Date(),
+      },
+      { returnDocument: 'after' }
+    );
+
+    if (!updatedWorkshop) {
+      throw new NotFoundException('Workshop was not created correctly');
+    }
+
+    return this.toWorkshopDto(updatedWorkshop);
+  }
+
+  async editWorkshopNameAndSummary(
+    workshop: UpdateWorkshopDto
+  ): Promise<WorkshopDto> {
+    const existingWorkshop = await this.workshopModel.findById(workshop._id);
+    if (!existingWorkshop) {
+      throw new NotFoundException('Workshop not found');
+    }
+
+    const { workshopDocumentGroupId } = existingWorkshop;
+    const newWorkshopDocumentGroupId = toSpinalCase(workshop.name!);
+    const updateStatus =
+      await this.workshopDocumentService.updateWorkshopDocumentsByWorkshopGroupId(
+        workshopDocumentGroupId,
+        newWorkshopDocumentGroupId
+      );
+    if (updateStatus) {
+      const updatedWorkshop = await this.workshopModel.findByIdAndUpdate(
+        workshop._id,
+        {
+          name: workshop.name,
+          summary: workshop.summary,
+          thumbnail: workshop.thumbnail,
+          workshopDocumentGroupId: newWorkshopDocumentGroupId,
+        },
+        { returnDocument: 'after' }
+      );
+
+      if (!updatedWorkshop) {
+        throw new NotFoundException('Workshop update failed');
+      }
+
+      return this.toWorkshopDto(updatedWorkshop);
+    }
+
+    throw new NotFoundException('Workshop documents could not be updated');
+  }
+
+  async deleteWorkshopAndWorkshopDocuments(
+    _id: string
+  ): Promise<{ acknowledged: boolean; deletedCount: number }> {
+    const workshopToDelete = await this.workshopModel.findById(_id);
+    if (!workshopToDelete) {
+      throw new NotFoundException('Workshop not found');
+    }
+
+    if (workshopToDelete.workshopDocuments?.length) {
+      await this.workshopDocumentService.deleteMany(
+        workshopToDelete.workshopDocuments
+      );
+    }
+
+    return this.workshopModel.deleteOne({ _id });
+  }
+
+  async sortWorkshops(workshops: UpdateWorkshopDto[]): Promise<WorkshopDto[]> {
+    const newWorkshops: WorkshopDto[] = [];
+    await Promise.all(
+      workshops.map(async (workshop) => {
+        const newWorkshop = await this.workshopModel.findByIdAndUpdate(
+          workshop._id,
+          { sortId: workshop.sortId },
+          { returnDocument: 'after' }
+        );
+        if (newWorkshop) {
+          newWorkshops.push(this.toWorkshopDto(newWorkshop));
+        }
+      })
+    );
+    return newWorkshops;
+  }
+
+  async createPage(
+    page: WorkshopDocumentDto,
+    workshopId: string
+  ): Promise<WorkshopDto> {
+    const { lastUpdated, ...rest } = page;
+    const workshop = await this.workshopDocumentService.createWorkshopDocument({
+      ...rest,
+      lastUpdated: lastUpdated ? new Date(lastUpdated) : undefined,
+    });
+    const workshopDocumentId = this.toWorkshopDocumentId(workshop);
+    const updatedWorkshop = await this.workshopModel.findByIdAndUpdate(
+      workshopId,
+      {
+        $push: {
+          workshopDocuments: {
+            _id: workshopDocumentId,
+            name: workshop.name,
+            sortId: workshop.sortId,
+          },
+        },
+        workshopDocumentsLastUpdated: new Date(),
+      },
+      { returnDocument: 'after' }
+    );
+
+    if (!updatedWorkshop) {
+      throw new NotFoundException('Workshop not found when adding page');
+    }
+
+    return this.toWorkshopDto(updatedWorkshop);
+  }
+
+  async deletePageAndUpdateWorkshop(
+    _id: string,
+    workshopIdToUpdate: string
+  ): Promise<{ acknowledged: boolean; deletedCount: number }> {
+    const workshop = await this.workshopModel.findByIdAndUpdate(
+      workshopIdToUpdate,
+      {
+        $pull: {
+          workshopDocuments: {
+            _id,
+          },
+        },
+        workshopDocumentsLastUpdated: new Date(),
+      },
+      { returnDocument: 'after' }
+    );
+
+    if (!workshop) {
+      throw new NotFoundException('Workshop not found when deleting page');
+    }
+
+    return this.workshopDocumentService.deleteOne(_id);
+  }
+
+  async editPageNameUpdateWorkshop({
+    _id,
+    name,
+    workshopGroupId,
+  }: WorkshopDocumentDto): Promise<WorkshopDto> {
+    const workshopDocumentBeforeUpdate =
+      await this.workshopDocumentService.updateWorkshopName(_id, name);
+    const newWorkshopDocument = {
+      _id,
+      name,
+      sortId: workshopDocumentBeforeUpdate.sortId,
+    };
+    const oldWorkshopDocument = {
+      _id,
+      name: workshopDocumentBeforeUpdate.name,
+      sortId: workshopDocumentBeforeUpdate.sortId,
+    };
+    const updatedWorkshop = await this.workshopModel.findByIdAndUpdate(
+      workshopGroupId,
+      { $set: { 'workshopDocuments.$[elem]': newWorkshopDocument } },
+      {
+        arrayFilters: [{ elem: { $eq: oldWorkshopDocument } }],
+        multi: true,
+        returnDocument: 'after',
+      }
+    );
+
+    if (!updatedWorkshop) {
+      throw new NotFoundException('Workshop not found when renaming page');
+    }
+
+    return this.toWorkshopDto(updatedWorkshop);
+  }
+
+  async sortPages(
+    pages: WorkshopDocumentIdentifierDto[],
+    workshopId: string
+  ): Promise<WorkshopDto> {
+    const updatedWorkshop = await this.workshopModel.findByIdAndUpdate(
+      workshopId,
+      {
+        workshopDocuments: pages,
+        workshopDocumentsLastUpdated: new Date(),
+      },
+      { returnDocument: 'after' }
+    );
+
+    if (!updatedWorkshop) {
+      throw new NotFoundException('Workshop not found when sorting pages');
+    }
+
+    return this.toWorkshopDto(updatedWorkshop);
+  }
+
+  private toWorkshopDto(workshop: TWorkshopDocument): WorkshopDto {
+    return {
+      _id: workshop._id.toString(),
+      workshopDocumentGroupId: workshop.workshopDocumentGroupId,
+      sectionId: workshop.sectionId,
+      sortId: workshop.sortId,
+      name: workshop.name,
+      summary: workshop.summary,
+      thumbnail: workshop.thumbnail,
+      workshopDocuments:
+        workshop.workshopDocuments?.map((doc) => ({
+          _id: (doc as WorkshopDocumentIdentifierDto)._id.toString(),
+          name: doc.name,
+          sortId: doc.sortId,
+        })) ?? [],
+      workshopDocumentsLastUpdated: workshop.workshopDocumentsLastUpdated,
+    };
+  }
+
+  private toWorkshopDocumentId(
+    workshopDocument: WorkshopDocumentDoc | TWorkshopDocument
+  ): string {
+    return (workshopDocument as TWorkshopDocument)._id.toString();
+  }
+}
