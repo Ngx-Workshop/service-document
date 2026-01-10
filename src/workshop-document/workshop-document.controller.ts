@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
-import { Auth, Role, Roles } from '@tmdjr/ngx-auth-client';
+import { Auth, RemoteAuthGuard, Role, Roles } from '@tmdjr/ngx-auth-client';
 import { AuthType } from '@tmdjr/ngx-auth-client/enums/auth-type.enum';
 import { WorkshopDocumentDto } from './dto/create.dto';
 import { WorkshopDocumentService } from './workshop-document.service';
@@ -10,6 +10,7 @@ export class WorkshopController {
   constructor(private workshopService: WorkshopDocumentService) {}
 
   @Get('workshops')
+  @UseGuards(RemoteAuthGuard)
   @ApiOkResponse({ type: WorkshopDocumentDto, isArray: true })
   workshops() {
     return this.workshopService.findAll();

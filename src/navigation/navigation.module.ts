@@ -48,6 +48,38 @@ const FAKE_PROVIDERS =
           provide: RemoteAuthGuard,
           useValue: { canActivate: () => true },
         },
+        {
+          provide: getModelToken(WorkshopDoc.name),
+          // Minimal fake the service can accept; if service calls methods during generation (it shouldn't), add no-op fns
+          useValue: {
+            // common Mongoose methods we might accidentally touch
+            find: () => ({ exec: async () => [] }),
+            findById: () => ({ exec: async () => null }),
+            findByIdAndUpdate: () => ({ exec: async () => null }),
+            findOne: () => ({ exec: async () => null }),
+          },
+        },
+        {
+          // In case the guard has runtime deps — make it a no-op
+          provide: RemoteAuthGuard,
+          useValue: { canActivate: () => true },
+        },
+        {
+          provide: getModelToken(WorkshopDocumentDoc.name),
+          // Minimal fake the service can accept; if service calls methods during generation (it shouldn't), add no-op fns
+          useValue: {
+            // common Mongoose methods we might accidentally touch
+            find: () => ({ exec: async () => [] }),
+            findById: () => ({ exec: async () => null }),
+            findByIdAndUpdate: () => ({ exec: async () => null }),
+            findOne: () => ({ exec: async () => null }),
+          },
+        },
+        {
+          // In case the guard has runtime deps — make it a no-op
+          provide: RemoteAuthGuard,
+          useValue: { canActivate: () => true },
+        },
       ]
     : [];
 
