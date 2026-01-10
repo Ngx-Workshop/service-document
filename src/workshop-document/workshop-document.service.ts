@@ -9,13 +9,13 @@ import { Model, isValidObjectId } from 'mongoose';
 import { WorkshopDocumentIdentifierDto } from './dto/create.dto';
 import {
   TWorkshopDocument,
-  WorkshopDocumentDoc,
+  WorkshopDocument,
 } from './schemas/workshop-document.schema';
 
 @Injectable()
 export class WorkshopDocumentService {
   constructor(
-    @InjectModel(WorkshopDocumentDoc.name)
+    @InjectModel(WorkshopDocument.name)
     private workshopDocumentModel: Model<TWorkshopDocument>
   ) {}
 
@@ -25,22 +25,20 @@ export class WorkshopDocumentService {
     }
   }
 
-  async getWorkshop(id: string): Promise<WorkshopDocumentDoc> {
+  async getWorkshop(id: string): Promise<WorkshopDocument> {
     this.ensureValidObjectId(id);
-    const workshopDocumentDoc = await this.workshopDocumentModel
+    const WorkshopDocument = await this.workshopDocumentModel
       .findById(id)
       .exec();
-    if (!workshopDocumentDoc) {
-      throw new NotFoundException(
-        `WorkshopDocumentDoc with ID "${id}" not found`
-      );
+    if (!WorkshopDocument) {
+      throw new NotFoundException(`WorkshopDocument with ID "${id}" not found`);
     }
-    return workshopDocumentDoc;
+    return WorkshopDocument;
   }
 
   async getWorkshopDocumentsByWorkshopGroupId(
     workshopGroupId: string
-  ): Promise<WorkshopDocumentDoc[]> {
+  ): Promise<WorkshopDocument[]> {
     return this.workshopDocumentModel.find({ workshopGroupId }).exec();
   }
 
@@ -54,17 +52,17 @@ export class WorkshopDocumentService {
   }
 
   async createWorkshopDocument(
-    workshop: Partial<WorkshopDocumentDoc>
-  ): Promise<WorkshopDocumentDoc> {
+    workshop: Partial<WorkshopDocument>
+  ): Promise<WorkshopDocument> {
     return this.workshopDocumentModel.create(workshop);
   }
 
-  async findAll(): Promise<WorkshopDocumentDoc[]> {
+  async findAll(): Promise<WorkshopDocument[]> {
     return this.workshopDocumentModel.find().exec();
   }
 
   async deleteMany(
-    workshopDocuments: WorkshopDocumentDoc[] | WorkshopDocumentIdentifierDto[]
+    workshopDocuments: WorkshopDocument[] | WorkshopDocumentIdentifierDto[]
   ) {
     return await this.workshopDocumentModel.deleteMany({
       _id: workshopDocuments,
@@ -79,51 +77,48 @@ export class WorkshopDocumentService {
   async updateWorkshopName(
     id: string,
     name: string
-  ): Promise<WorkshopDocumentDoc> {
+  ): Promise<WorkshopDocument> {
     this.ensureValidObjectId(id);
     try {
-      const updateWorkshopDocumentDoc = await this.workshopDocumentModel
+      const updateWorkshopDocument = await this.workshopDocumentModel
         .findByIdAndUpdate(id, { name }, { returnDocument: 'before' })
         .exec();
 
-      if (!updateWorkshopDocumentDoc) {
+      if (!updateWorkshopDocument) {
         throw new NotFoundException(
-          `WorkshopDocumentDoc with ID "${id}" not found`
+          `WorkshopDocument with ID "${id}" not found`
         );
       }
 
-      return updateWorkshopDocumentDoc;
+      return updateWorkshopDocument;
     } catch (error) {
       if (error.code === 11000) {
         throw new ConflictException(
-          'WorkshopDocumentDoc with this name already exists'
+          'WorkshopDocument with this name already exists'
         );
       }
       throw error;
     }
   }
 
-  async updateWorkshopHtml(
-    id: any,
-    html: string
-  ): Promise<WorkshopDocumentDoc> {
+  async updateWorkshopHtml(id: any, html: string): Promise<WorkshopDocument> {
     this.ensureValidObjectId(id);
     try {
-      const updateWorkshopDocumentDoc = await this.workshopDocumentModel
+      const updateWorkshopDocument = await this.workshopDocumentModel
         .findByIdAndUpdate(id, { html }, { returnDocument: 'after' })
         .exec();
 
-      if (!updateWorkshopDocumentDoc) {
+      if (!updateWorkshopDocument) {
         throw new NotFoundException(
-          `WorkshopDocumentDoc with ID "${id}" not found`
+          `WorkshopDocument with ID "${id}" not found`
         );
       }
 
-      return updateWorkshopDocumentDoc;
+      return updateWorkshopDocument;
     } catch (error) {
       if (error.code === 11000) {
         throw new ConflictException(
-          'WorkshopDocumentDoc with this name already exists'
+          'WorkshopDocument with this name already exists'
         );
       }
       throw error;

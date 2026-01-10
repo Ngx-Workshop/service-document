@@ -9,7 +9,7 @@ import {
   RolesGuard,
 } from '@tmdjr/ngx-auth-client';
 import {
-  WorkshopDocumentDoc,
+  WorkshopDocument,
   WorkshopDocumentSchema,
 } from './schemas/workshop-document.schema';
 import { WorkshopController } from './workshop-document.controller';
@@ -20,7 +20,7 @@ const SCHEMA_IMPORTS =
     ? []
     : [
         MongooseModule.forFeature([
-          { name: WorkshopDocumentDoc.name, schema: WorkshopDocumentSchema },
+          { name: WorkshopDocument.name, schema: WorkshopDocumentSchema },
         ]),
       ];
 // When generating OpenAPI, stub out the Mongoose model and the guard
@@ -28,7 +28,7 @@ const FAKE_PROVIDERS =
   process.env.GENERATE_OPENAPI === 'true'
     ? [
         {
-          provide: getModelToken(WorkshopDocumentDoc.name),
+          provide: getModelToken(WorkshopDocument.name),
           // Minimal fake the service can accept; if service calls methods during generation (it shouldn't), add no-op fns
           useValue: {
             // common Mongoose methods we might accidentally touch

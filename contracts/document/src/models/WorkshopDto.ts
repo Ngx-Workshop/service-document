@@ -4,14 +4,13 @@
 /* eslint-disable */
 import type { WorkshopDocumentIdentifierDto } from './WorkshopDocumentIdentifierDto';
 export type WorkshopDto = {
-    _id: string;
-    workshopDocumentGroupId: string;
-    sectionId: string;
-    sortId: number;
-    name: string;
-    summary: string;
-    thumbnail: string;
-    workshopDocuments: Array<WorkshopDocumentIdentifierDto>;
-    workshopDocumentsLastUpdated: string;
+  _id: string;
+  workshopDocumentGroupId: string;
+  sectionId: string;
+  sortId: number;
+  name: string;
+  summary: string;
+  thumbnail: string;
+  workshopDocuments: Array<WorkshopDocumentIdentifierDto>;
+  workshopDocumentsLastUpdated: string;
 };
-

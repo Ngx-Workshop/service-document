@@ -9,14 +9,14 @@ import {
   RolesGuard,
 } from '@tmdjr/ngx-auth-client';
 import {
-  WorkshopDocumentDoc,
+  WorkshopDocument,
   WorkshopDocumentSchema,
 } from '../workshop-document/schemas/workshop-document.schema';
 import { WorkshopDocumentService } from '../workshop-document/workshop-document.service';
 import { NavigationController } from './navigation.controller';
 import { NavigationService } from './navigation.service';
 import { Section, SectionSchema } from './schemas/section.schema';
-import { WorkshopDoc, WorkshopSchema } from './schemas/workshop.schema';
+import { Workshop, WorkshopSchema } from './schemas/workshop.schema';
 
 const SCHEMA_IMPORTS =
   process.env.GENERATE_OPENAPI === 'true'
@@ -24,8 +24,8 @@ const SCHEMA_IMPORTS =
     : [
         MongooseModule.forFeature([
           { name: Section.name, schema: SectionSchema },
-          { name: WorkshopDoc.name, schema: WorkshopSchema },
-          { name: WorkshopDocumentDoc.name, schema: WorkshopDocumentSchema },
+          { name: Workshop.name, schema: WorkshopSchema },
+          { name: WorkshopDocument.name, schema: WorkshopDocumentSchema },
         ]),
       ];
 // When generating OpenAPI, stub out the Mongoose model and the guard
@@ -49,7 +49,7 @@ const FAKE_PROVIDERS =
           useValue: { canActivate: () => true },
         },
         {
-          provide: getModelToken(WorkshopDoc.name),
+          provide: getModelToken(Workshop.name),
           // Minimal fake the service can accept; if service calls methods during generation (it shouldn't), add no-op fns
           useValue: {
             // common Mongoose methods we might accidentally touch
@@ -65,7 +65,7 @@ const FAKE_PROVIDERS =
           useValue: { canActivate: () => true },
         },
         {
-          provide: getModelToken(WorkshopDocumentDoc.name),
+          provide: getModelToken(WorkshopDocument.name),
           // Minimal fake the service can accept; if service calls methods during generation (it shouldn't), add no-op fns
           useValue: {
             // common Mongoose methods we might accidentally touch

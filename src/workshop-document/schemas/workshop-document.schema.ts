@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
-export type TWorkshopDocument = HydratedDocument<WorkshopDocumentDoc>;
+export type TWorkshopDocument = HydratedDocument<WorkshopDocument>;
 
 @Schema()
-export class WorkshopDocumentDoc {
+export class WorkshopDocument {
   @Prop({ required: true })
   workshopGroupId: string;
 
@@ -27,7 +27,7 @@ export class WorkshopDocumentDoc {
 }
 
 export const WorkshopDocumentSchema =
-  SchemaFactory.createForClass(WorkshopDocumentDoc);
+  SchemaFactory.createForClass(WorkshopDocument);
 
 const defaultWorkshopDocumentHtml = [
   {

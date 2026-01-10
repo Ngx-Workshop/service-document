@@ -16,7 +16,7 @@ import {
 } from './dto/create.dto';
 import { UpdateWorkshopDto } from './dto/update.dto';
 import { NavigationService } from './navigation.service';
-import { WorkshopDoc } from './schemas/workshop.schema';
+import { Workshop } from './schemas/workshop.schema';
 
 @ApiExtraModels(SectionDto)
 @Controller('navigation')
@@ -32,21 +32,21 @@ export class NavigationController {
 
   @Get('workshops')
   @Auth(AuthType.None)
-  @ApiOkResponse({ type: WorkshopDoc, isArray: true })
+  @ApiOkResponse({ type: Workshop, isArray: true })
   workshops(@Query('section') section: string) {
     return this.navigationService.findAllWorkshopsInSection(section);
   }
 
   @Roles(Role.Admin)
   @Post('workshop/create-workshop')
-  @ApiOkResponse({ type: WorkshopDoc })
+  @ApiOkResponse({ type: Workshop })
   async createWorkshop(@Body() workshop: CreateWorkshopDto) {
     return await this.navigationService.createWorkshop(workshop);
   }
 
   @Roles(Role.Admin)
   @Post('workshop/edit-workshop-name-and-summary')
-  @ApiOkResponse({ type: WorkshopDoc })
+  @ApiOkResponse({ type: Workshop })
   async editWorkshopNameAndSummary(@Body() workshop: UpdateWorkshopDto) {
     return await this.navigationService.editWorkshopNameAndSummary(workshop);
   }
@@ -60,14 +60,14 @@ export class NavigationController {
 
   @Post('workshop/sort-workshops')
   @Roles(Role.Admin)
-  @ApiOkResponse({ type: WorkshopDoc, isArray: true })
+  @ApiOkResponse({ type: Workshop, isArray: true })
   async sortWorkshops(@Body() workshops: UpdateWorkshopDto[]) {
     return await this.navigationService.sortWorkshops(workshops);
   }
 
   @Post('page/create-page')
   @Roles(Role.Admin)
-  @ApiOkResponse({ type: WorkshopDoc })
+  @ApiOkResponse({ type: Workshop })
   async createPage(
     @Body()
     { page, workshopId }: PageParamsDto

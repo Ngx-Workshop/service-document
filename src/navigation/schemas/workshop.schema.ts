@@ -2,10 +2,10 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { WorkshopDocumentIdentifierDto } from 'src/workshop-document/dto/create.dto';
 
-export type TWorkshopDocument = HydratedDocument<WorkshopDoc>;
+export type TWorkshopDocument = HydratedDocument<Workshop>;
 
 @Schema()
-export class WorkshopDoc {
+export class Workshop {
   @Prop()
   workshopDocumentGroupId: string;
 
@@ -36,7 +36,7 @@ export class WorkshopDoc {
   workshopDocumentsLastUpdated: Date;
 }
 
-export const WorkshopSchema = SchemaFactory.createForClass(WorkshopDoc);
+export const WorkshopSchema = SchemaFactory.createForClass(Workshop);
 
 WorkshopSchema.pre('save', async function () {
   if (this.isNew) {

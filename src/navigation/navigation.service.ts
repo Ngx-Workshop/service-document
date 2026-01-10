@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { WorkshopDocumentDoc } from '../workshop-document/schemas/workshop-document.schema';
+import { WorkshopDocument } from '../workshop-document/schemas/workshop-document.schema';
 import { WorkshopDocumentService } from '../workshop-document/workshop-document.service';
 
 import {
@@ -19,7 +19,7 @@ import { UpdateWorkshopDto } from './dto/update.dto';
 import { Section, SectionDocumentDoc } from './schemas/section.schema';
 import {
   TWorkshopDocument,
-  WorkshopDoc,
+  Workshop,
   toSpinalCase,
 } from './schemas/workshop.schema';
 
@@ -27,7 +27,7 @@ import {
 export class NavigationService {
   constructor(
     @InjectModel(Section.name) private sectionModel: Model<SectionDocumentDoc>,
-    @InjectModel(WorkshopDoc.name)
+    @InjectModel(Workshop.name)
     private workshopModel: Model<TWorkshopDocument>,
     private workshopDocumentService: WorkshopDocumentService
   ) {}
@@ -288,7 +288,7 @@ export class NavigationService {
   }
 
   private toWorkshopDocumentId(
-    workshopDocument: WorkshopDocumentDoc | TWorkshopDocument
+    workshopDocument: WorkshopDocument | TWorkshopDocument
   ): string {
     return (workshopDocument as TWorkshopDocument)._id.toString();
   }
