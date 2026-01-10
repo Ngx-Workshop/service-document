@@ -391,6 +391,37 @@
   "servers": [],
   "components": {
     "schemas": {
+      "SectionDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "sectionTitle": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "number"
+          },
+          "menuSvgPath": {
+            "type": "string"
+          },
+          "headerSvgPath": {
+            "type": "string"
+          },
+          "categoriesLastUpdated": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "_id",
+          "sectionTitle",
+          "summary",
+          "menuSvgPath",
+          "headerSvgPath",
+          "categoriesLastUpdated"
+        ]
+      },
       "SectionsMapDto": {
         "type": "object",
         "properties": {

@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { ApiExtraModels, ApiOkResponse } from '@nestjs/swagger';
 import { Auth, Role, Roles } from '@tmdjr/ngx-auth-client';
 import { AuthType } from '@tmdjr/ngx-auth-client/enums/auth-type.enum';
 import {
@@ -10,6 +10,7 @@ import {
   CreateWorkshopDto,
   DeleteResultDto,
   PageParamsDto,
+  SectionDto,
   SectionsMapDto,
   WorkshopDto,
 } from './dto/create.dto';
@@ -17,6 +18,7 @@ import { UpdateWorkshopDto } from './dto/update.dto';
 import { NavigationService } from './navigation.service';
 import { WorkshopDoc } from './schemas/workshop.schema';
 
+@ApiExtraModels(SectionDto)
 @Controller('navigation')
 export class NavigationController {
   constructor(private navigationService: NavigationService) {}
