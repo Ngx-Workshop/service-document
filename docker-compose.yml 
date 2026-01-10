@@ -7,7 +7,7 @@ services:
     container_name: document
     restart: unless-stopped
     ports:
-      - "3003:3003"
+      - "3007:3007"
     env_file:
       - .env
     networks:
