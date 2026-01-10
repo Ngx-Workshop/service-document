@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/example-crud/auth-test": {
+    "/navigation/sections": {
       "get": {
-        "operationId": "ExampleCrudController_authTest",
+        "operationId": "NavigationController_sections",
         "parameters": [],
         "responses": {
           "200": {
@@ -11,57 +11,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AuthTestDto"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SectionsMapDto"
+                  }
                 }
               }
             }
           }
         },
         "tags": [
-          "Example Crud"
+          "Navigation"
         ]
       }
     },
-    "/example-crud": {
-      "post": {
-        "operationId": "ExampleCrudController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateExampleMongodbDocDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExampleMongodbDocDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Example Crud"
-        ]
-      },
+    "/navigation/workshops": {
       "get": {
-        "operationId": "ExampleCrudController_findAll",
+        "operationId": "NavigationController_workshops",
         "parameters": [
           {
-            "name": "archived",
-            "required": false,
+            "name": "section",
+            "required": true,
             "in": "query",
-            "description": "Filter by archived status",
             "schema": {
-              "type": "boolean"
+              "type": "string"
             }
           }
         ],
@@ -73,7 +46,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ExampleMongodbDocDto"
+                    "$ref": "#/components/schemas/WorkshopDoc"
                   }
                 }
               }
@@ -81,46 +54,231 @@
           }
         },
         "tags": [
-          "Example Crud"
+          "Navigation"
         ]
       }
     },
-    "/example-crud/{id}": {
-      "get": {
-        "operationId": "ExampleCrudController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
+    "/navigation/workshop/create-workshop": {
+      "post": {
+        "operationId": "NavigationController_createWorkshop",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkshopDto"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExampleMongodbDocDto"
+                  "$ref": "#/components/schemas/WorkshopDoc"
                 }
               }
             }
           }
         },
         "tags": [
-          "Example Crud"
+          "Navigation"
         ]
-      },
-      "patch": {
-        "operationId": "ExampleCrudController_update",
+      }
+    },
+    "/navigation/workshop/edit-workshop-name-and-summary": {
+      "post": {
+        "operationId": "NavigationController_editWorkshopNameAndSummary",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWorkshopDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkshopDoc"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/workshop/delete-workshop-and-workshop-documents": {
+      "post": {
+        "operationId": "NavigationController_deleteWorkshopAndWorkshops",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteResultDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/workshop/sort-workshops": {
+      "post": {
+        "operationId": "NavigationController_sortWorkshops",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkshopDoc"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/page/create-page": {
+      "post": {
+        "operationId": "NavigationController_createPage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageParamsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkshopDoc"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/page/delete-page-and-update-workshop": {
+      "post": {
+        "operationId": "NavigationController_deletePageAndUpdateWorkshop",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PageParamsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteResultDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/page/edit-page-name-update-workshop": {
+      "post": {
+        "operationId": "NavigationController_editPageNameUpdateWorkshop",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkshopDocumentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkshopDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/page/sort-pages": {
+      "post": {
+        "operationId": "NavigationController_sortPages",
         "parameters": [
           {
-            "name": "id",
+            "name": "workshopId",
             "required": true,
-            "in": "path",
+            "in": "query",
             "schema": {
               "type": "string"
             }
@@ -131,7 +289,10 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateExampleMongodbDocDto"
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -142,125 +303,80 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExampleMongodbDocDto"
+                  "$ref": "#/components/schemas/WorkshopDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "Example Crud"
-        ]
-      },
-      "delete": {
-        "operationId": "ExampleCrudController_remove",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "Example Crud"
+          "Navigation"
         ]
       }
     },
-    "/example-crud/name/{name}": {
+    "/workshop/workshops": {
       "get": {
-        "operationId": "ExampleCrudController_findByName",
-        "parameters": [
-          {
-            "name": "name",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "operationId": "WorkshopController_workshops",
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExampleMongodbDocDto"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkshopDocumentDto"
+                  }
                 }
               }
             }
           }
         },
         "tags": [
-          "Example Crud"
+          "Workshop"
         ]
       }
     },
-    "/example-crud/{id}/archive": {
-      "patch": {
-        "operationId": "ExampleCrudController_archive",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+    "/workshop/{objectId}": {
+      "get": {
+        "operationId": "WorkshopController_workshop",
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExampleMongodbDocDto"
+                  "$ref": "#/components/schemas/WorkshopDocumentDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "Example Crud"
+          "Workshop"
         ]
       }
     },
-    "/example-crud/{id}/unarchive": {
-      "patch": {
-        "operationId": "ExampleCrudController_unarchive",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+    "/workshop/update-workshop-html": {
+      "post": {
+        "operationId": "WorkshopController_updateWorkshopHtml",
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExampleMongodbDocDto"
+                  "$ref": "#/components/schemas/WorkshopDocumentDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "Example Crud"
+          "Workshop"
         ]
       }
     }
@@ -275,103 +391,171 @@
   "servers": [],
   "components": {
     "schemas": {
-      "AuthTestDto": {
+      "SectionsMapDto": {
         "type": "object",
         "properties": {
-          "message": {
-            "type": "string"
+          "sections": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SectionDto"
+            }
           }
         },
         "required": [
-          "message"
+          "sections"
         ]
       },
-      "ExampleMongodbDocObjectDto": {
+      "WorkshopDoc": {
         "type": "object",
-        "properties": {
-          "street": {
-            "type": "string"
-          },
-          "city": {
-            "type": "string"
-          },
-          "state": {
-            "type": "string"
-          },
-          "zip": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "street",
-          "city",
-          "state",
-          "zip"
-        ]
+        "properties": {}
       },
-      "CreateExampleMongodbDocDto": {
+      "WorkshopDocumentIdentifierDto": {
         "type": "object",
         "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Object id of the workshop-document."
+          },
           "name": {
-            "type": "string"
-          },
-          "type": {
             "type": "string",
-            "enum": [
-              "SOME_ENUM",
-              "SOME_OTHER_ENUM"
-            ]
+            "description": "Display name of the workshop-document."
           },
-          "description": {
-            "type": "string"
-          },
-          "archived": {
-            "type": "boolean"
-          },
-          "exampleMongodbDocObject": {
-            "$ref": "#/components/schemas/ExampleMongodbDocObjectDto"
-          },
-          "lastUpdated": {
-            "type": "string",
-            "format": "date-time"
+          "sortId": {
+            "type": "number",
+            "description": "Position of the doc item in the section's list"
           }
         },
         "required": [
+          "_id",
           "name",
-          "type"
+          "sortId"
         ]
       },
-      "ExampleMongodbDocDto": {
+      "CreateWorkshopDto": {
         "type": "object",
         "properties": {
           "_id": {
             "type": "string"
           },
+          "sectionId": {
+            "type": "string"
+          },
+          "workshopDocumentGroupId": {
+            "type": "string"
+          },
+          "sortId": {
+            "type": "number",
+            "default": 0
+          },
           "name": {
             "type": "string"
           },
-          "type": {
-            "type": "string",
-            "enum": [
-              "SOME_ENUM",
-              "SOME_OTHER_ENUM"
-            ]
-          },
-          "version": {
-            "type": "number"
-          },
-          "description": {
+          "summary": {
             "type": "string"
+          },
+          "thumbnail": {
+            "type": "string",
+            "default": "https://via.placeholder.com/250/400"
+          },
+          "workshopDocuments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkshopDocumentIdentifierDto"
+            }
+          },
+          "workshopDocumentsLastUpdated": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "_id",
+          "sectionId",
+          "name",
+          "summary"
+        ]
+      },
+      "UpdateWorkshopDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "sectionId": {
+            "type": "string"
+          },
+          "workshopDocumentGroupId": {
+            "type": "string"
+          },
+          "sortId": {
+            "type": "number",
+            "default": 0
+          },
+          "name": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "thumbnail": {
+            "type": "string",
+            "default": "https://via.placeholder.com/250/400"
+          },
+          "workshopDocuments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkshopDocumentIdentifierDto"
+            }
+          },
+          "workshopDocumentsLastUpdated": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DeleteResultDto": {
+        "type": "object",
+        "properties": {
+          "acknowledged": {
+            "type": "boolean"
+          },
+          "deletedCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "acknowledged",
+          "deletedCount"
+        ]
+      },
+      "WorkshopDocumentDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "workshopGroupId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "default": "Page"
+          },
+          "sortId": {
+            "type": "number",
+            "default": 0
+          },
+          "pageType": {
+            "type": "string",
+            "default": "PAGE"
           },
           "lastUpdated": {
             "type": "string",
             "format": "date-time"
           },
-          "archived": {
-            "type": "boolean"
-          },
-          "exampleMongodbDocObject": {
-            "$ref": "#/components/schemas/ExampleMongodbDocObjectDto"
+          "html": {
+            "type": "string",
+            "description": "Serialized JSON of the document blocks"
           },
           "__v": {
             "type": "number"
@@ -379,42 +563,78 @@
         },
         "required": [
           "_id",
+          "workshopGroupId",
           "name",
-          "type",
-          "version",
-          "description",
+          "sortId",
+          "pageType",
           "lastUpdated",
-          "archived",
+          "html",
           "__v"
         ]
       },
-      "UpdateExampleMongodbDocDto": {
+      "PageParamsDto": {
         "type": "object",
         "properties": {
+          "page": {
+            "$ref": "#/components/schemas/WorkshopDocumentDto"
+          },
+          "workshopId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "page",
+          "workshopId"
+        ]
+      },
+      "WorkshopDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "workshopDocumentGroupId": {
+            "type": "string"
+          },
+          "sectionId": {
+            "type": "string"
+          },
+          "sortId": {
+            "type": "number",
+            "default": 0
+          },
           "name": {
             "type": "string"
           },
-          "type": {
-            "type": "string",
-            "enum": [
-              "SOME_ENUM",
-              "SOME_OTHER_ENUM"
-            ]
-          },
-          "description": {
+          "summary": {
             "type": "string"
           },
-          "archived": {
-            "type": "boolean"
+          "thumbnail": {
+            "type": "string",
+            "default": "https://via.placeholder.com/250/400"
           },
-          "exampleMongodbDocObject": {
-            "$ref": "#/components/schemas/ExampleMongodbDocObjectDto"
+          "workshopDocuments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkshopDocumentIdentifierDto"
+            }
           },
-          "lastUpdated": {
+          "workshopDocumentsLastUpdated": {
             "type": "string",
             "format": "date-time"
           }
-        }
+        },
+        "required": [
+          "_id",
+          "workshopDocumentGroupId",
+          "sectionId",
+          "sortId",
+          "name",
+          "summary",
+          "thumbnail",
+          "workshopDocuments",
+          "workshopDocumentsLastUpdated"
+        ]
       }
     }
   }
