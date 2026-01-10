@@ -23,7 +23,7 @@ async function generate() {
 
   console.log('🧩 [openapi] Creating Swagger document...');
   const config = new DocumentBuilder()
-    .setTitle('NGX seed-service-nestjs API')
+    .setTitle('NGX document API')
     .setVersion('1.0.0')
     .build();
 

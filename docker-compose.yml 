@@ -2,9 +2,9 @@
 version: '3.8'
 
 services:
-  seed-service-nestjs:
+  document:
     build: .
-    container_name: seed-service-nestjs
+    container_name: document
     restart: unless-stopped
     ports:
       - "3003:3003"
