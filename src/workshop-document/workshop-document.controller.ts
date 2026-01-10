@@ -11,7 +11,7 @@ export class WorkshopController {
 
   @Get('health')
   health() {
-    return { status: 'All good' };
+    return { status: 'All good Maybe?' };
   }
 
   @Get('workshops')
