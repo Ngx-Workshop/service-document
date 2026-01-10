@@ -1,10 +1,11 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, isValidObjectId } from 'mongoose';
 import { WorkshopDocumentIdentifierDto } from './dto/create.dto';
 import {
   TWorkshopDocument,
@@ -18,7 +19,14 @@ export class WorkshopDocumentService {
     private workshopDocumentModel: Model<TWorkshopDocument>
   ) {}
 
+  private ensureValidObjectId(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException(`Invalid ObjectId: "${id}"`);
+    }
+  }
+
   async getWorkshop(id: string): Promise<WorkshopDocumentDoc> {
+    this.ensureValidObjectId(id);
     const workshopDocumentDoc = await this.workshopDocumentModel
       .findById(id)
       .exec();
@@ -64,6 +72,7 @@ export class WorkshopDocumentService {
   }
 
   async deleteOne(_id: string) {
+    this.ensureValidObjectId(_id);
     return await this.workshopDocumentModel.deleteOne({ _id });
   }
 
@@ -71,6 +80,7 @@ export class WorkshopDocumentService {
     id: string,
     name: string
   ): Promise<WorkshopDocumentDoc> {
+    this.ensureValidObjectId(id);
     try {
       const updateWorkshopDocumentDoc = await this.workshopDocumentModel
         .findByIdAndUpdate(id, { name }, { returnDocument: 'before' })
@@ -97,6 +107,7 @@ export class WorkshopDocumentService {
     id: any,
     html: string
   ): Promise<WorkshopDocumentDoc> {
+    this.ensureValidObjectId(id);
     try {
       const updateWorkshopDocumentDoc = await this.workshopDocumentModel
         .findByIdAndUpdate(id, { html }, { returnDocument: 'after' })
