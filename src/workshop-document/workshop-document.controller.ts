@@ -9,6 +9,11 @@ import { WorkshopDocumentService } from './workshop-document.service';
 export class WorkshopController {
   constructor(private workshopService: WorkshopDocumentService) {}
 
+  @Get('health')
+  health() {
+    return { status: 'All good' };
+  }
+
   @Get('workshops')
   @UseGuards(RemoteAuthGuard)
   @ApiOkResponse({ type: WorkshopDocumentDto, isArray: true })
