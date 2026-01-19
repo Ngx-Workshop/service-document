@@ -9,8 +9,8 @@ import {
 } from 'src/workshop-page/dto/create.dto';
 import {
   CreateWorkshopDto,
+  DeletePageParamsDto,
   DeleteResultDto,
-  PageParamsDto,
   SectionDto,
   SectionsMapDto,
   WorkshopDto,
@@ -81,7 +81,7 @@ export class NavigationController {
   @ApiOkResponse({ type: DeleteResultDto })
   async deletePageAndUpdateWorkshop(
     @Body()
-    { page, workshopId }: PageParamsDto
+    { page, workshopId }: DeletePageParamsDto
   ): Promise<DeleteResultDto> {
     return await this.navigationService.deletePageAndUpdateWorkshop(
       page._id,

@@ -13,10 +13,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import {
-  WorkshopPageDto,
-  WorkshopPageIdentifierDto,
-} from '../../workshop-page/dto/create.dto';
+import { WorkshopPageIdentifierDto } from '../../workshop-page/dto/create.dto';
 
 export class SectionDto {
   @ApiProperty() _id: string;
@@ -142,15 +139,33 @@ export class CreateWorkshopDto {
   workshopDocumentsLastUpdated?: string;
 }
 
-export class PageParamsDto {
-  @ApiProperty({ type: WorkshopPageDto })
-  @Type(() => WorkshopPageDto)
+export class DeletePageDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  _id: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  workshopId: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+}
+
+export class DeletePageParamsDto {
+  @ApiProperty({ type: DeletePageDto })
+  @Type(() => DeletePageDto)
   @ValidateNested()
-  page: WorkshopPageDto;
+  page: DeletePageDto;
 
   @ApiProperty()
   workshopId: string;
 }
+
 export class DeleteResultDto {
   @ApiProperty()
   acknowledged: boolean;
