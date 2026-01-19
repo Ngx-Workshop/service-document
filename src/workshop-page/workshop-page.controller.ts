@@ -2,8 +2,8 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { Auth, RemoteAuthGuard, Role, Roles } from '@tmdjr/ngx-auth-client';
 import { AuthType } from '@tmdjr/ngx-auth-client/enums/auth-type.enum';
-import { WorkshopDocumentDto } from './dto/create.dto';
-import { WorkshopDocumentService } from './workshop-document.service';
+import { WorkshopPageDto } from './dto/create.dto';
+import { WorkshopDocumentService } from './workshop-page.service';
 
 @Controller('workshop')
 export class WorkshopController {
@@ -16,21 +16,21 @@ export class WorkshopController {
 
   @Get('workshops')
   @UseGuards(RemoteAuthGuard)
-  @ApiOkResponse({ type: WorkshopDocumentDto, isArray: true })
+  @ApiOkResponse({ type: WorkshopPageDto, isArray: true })
   workshops() {
     return this.workshopService.findAll();
   }
 
   @Auth(AuthType.None)
   @Get(':objectId')
-  @ApiOkResponse({ type: WorkshopDocumentDto })
+  @ApiOkResponse({ type: WorkshopPageDto })
   workshop(@Param('objectId') objectId) {
     return this.workshopService.getWorkshop(objectId);
   }
 
   @Roles(Role.Admin)
   @Post('update-workshop-html')
-  @ApiOkResponse({ type: WorkshopDocumentDto })
+  @ApiOkResponse({ type: WorkshopPageDto })
   async updateWorkshopHtml(
     @Body() { html, _id }: { html: string; _id: string }
   ) {

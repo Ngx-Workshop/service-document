@@ -2,13 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { WorkshopDocument } from '../workshop-document/schemas/workshop-document.schema';
-import { WorkshopDocumentService } from '../workshop-document/workshop-document.service';
+import { WorkshopPage } from '../workshop-page/schemas/workshop-page.schema';
+import { WorkshopDocumentService } from '../workshop-page/workshop-page.service';
 
 import {
-  WorkshopDocumentDto,
-  WorkshopDocumentIdentifierDto,
-} from 'src/workshop-document/dto/create.dto';
+  CreateWorkshopPageDto,
+  WorkshopPageDto,
+  WorkshopPageIdentifierDto,
+} from 'src/workshop-page/dto/create.dto';
 import {
   CreateWorkshopDto,
   SectionDto,
@@ -158,10 +159,7 @@ export class NavigationService {
     return newWorkshops;
   }
 
-  async createPage(
-    page: WorkshopDocumentDto,
-    workshopId: string
-  ): Promise<WorkshopDto> {
+  async createPage(page: CreateWorkshopPageDto): Promise<WorkshopDto> {
     const { lastUpdated, ...rest } = page;
     const workshop = await this.workshopDocumentService.createWorkshopDocument({
       ...rest,
@@ -169,7 +167,7 @@ export class NavigationService {
     });
     const workshopDocumentId = this.toWorkshopDocumentId(workshop);
     const updatedWorkshop = await this.workshopModel.findByIdAndUpdate(
-      workshopId,
+      page.workshopGroupId,
       {
         $push: {
           workshopDocuments: {
@@ -218,7 +216,7 @@ export class NavigationService {
     _id,
     name,
     workshopGroupId,
-  }: WorkshopDocumentDto): Promise<WorkshopDto> {
+  }: WorkshopPageDto): Promise<WorkshopDto> {
     const workshopDocumentBeforeUpdate =
       await this.workshopDocumentService.updateWorkshopName(_id, name);
     const newWorkshopDocument = {
@@ -249,7 +247,7 @@ export class NavigationService {
   }
 
   async sortPages(
-    pages: WorkshopDocumentIdentifierDto[],
+    pages: WorkshopPageIdentifierDto[],
     workshopId: string
   ): Promise<WorkshopDto> {
     const updatedWorkshop = await this.workshopModel.findByIdAndUpdate(
@@ -279,7 +277,7 @@ export class NavigationService {
       thumbnail: workshop.thumbnail,
       workshopDocuments:
         workshop.workshopDocuments?.map((doc) => ({
-          _id: (doc as WorkshopDocumentIdentifierDto)._id.toString(),
+          _id: (doc as WorkshopPageIdentifierDto)._id.toString(),
           name: doc.name,
           sortId: doc.sortId,
         })) ?? [],
@@ -288,7 +286,7 @@ export class NavigationService {
   }
 
   private toWorkshopDocumentId(
-    workshopDocument: WorkshopDocument | TWorkshopDocument
+    workshopDocument: WorkshopPage | TWorkshopDocument
   ): string {
     return (workshopDocument as TWorkshopDocument)._id.toString();
   }

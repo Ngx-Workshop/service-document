@@ -6,17 +6,17 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
-import { WorkshopDocumentIdentifierDto } from './dto/create.dto';
+import { WorkshopPageIdentifierDto } from './dto/create.dto';
 import {
-  TWorkshopDocument,
-  WorkshopDocument,
-} from './schemas/workshop-document.schema';
+  TWorkshopPageDocument,
+  WorkshopPage,
+} from './schemas/workshop-page.schema';
 
 @Injectable()
 export class WorkshopDocumentService {
   constructor(
-    @InjectModel(WorkshopDocument.name)
-    private workshopDocumentModel: Model<TWorkshopDocument>
+    @InjectModel(WorkshopPage.name)
+    private workshopDocumentModel: Model<TWorkshopPageDocument>
   ) {}
 
   private ensureValidObjectId(id: string) {
@@ -25,7 +25,7 @@ export class WorkshopDocumentService {
     }
   }
 
-  async getWorkshop(id: string): Promise<WorkshopDocument> {
+  async getWorkshop(id: string): Promise<WorkshopPage> {
     this.ensureValidObjectId(id);
     const WorkshopDocument = await this.workshopDocumentModel
       .findById(id)
@@ -38,7 +38,7 @@ export class WorkshopDocumentService {
 
   async getWorkshopDocumentsByWorkshopGroupId(
     workshopGroupId: string
-  ): Promise<WorkshopDocument[]> {
+  ): Promise<WorkshopPage[]> {
     return this.workshopDocumentModel.find({ workshopGroupId }).exec();
   }
 
@@ -52,17 +52,17 @@ export class WorkshopDocumentService {
   }
 
   async createWorkshopDocument(
-    workshop: Partial<WorkshopDocument>
-  ): Promise<WorkshopDocument> {
+    workshop: Partial<WorkshopPage>
+  ): Promise<WorkshopPage> {
     return this.workshopDocumentModel.create(workshop);
   }
 
-  async findAll(): Promise<WorkshopDocument[]> {
+  async findAll(): Promise<WorkshopPage[]> {
     return this.workshopDocumentModel.find().exec();
   }
 
   async deleteMany(
-    workshopDocuments: WorkshopDocument[] | WorkshopDocumentIdentifierDto[]
+    workshopDocuments: WorkshopPage[] | WorkshopPageIdentifierDto[]
   ) {
     return await this.workshopDocumentModel.deleteMany({
       _id: workshopDocuments,
@@ -74,10 +74,7 @@ export class WorkshopDocumentService {
     return await this.workshopDocumentModel.deleteOne({ _id });
   }
 
-  async updateWorkshopName(
-    id: string,
-    name: string
-  ): Promise<WorkshopDocument> {
+  async updateWorkshopName(id: string, name: string): Promise<WorkshopPage> {
     this.ensureValidObjectId(id);
     try {
       const updateWorkshopDocument = await this.workshopDocumentModel
@@ -101,7 +98,7 @@ export class WorkshopDocumentService {
     }
   }
 
-  async updateWorkshopHtml(id: any, html: string): Promise<WorkshopDocument> {
+  async updateWorkshopHtml(id: any, html: string): Promise<WorkshopPage> {
     this.ensureValidObjectId(id);
     try {
       const updateWorkshopDocument = await this.workshopDocumentModel

@@ -3,9 +3,10 @@ import { ApiExtraModels, ApiOkResponse } from '@nestjs/swagger';
 import { Auth, Role, Roles } from '@tmdjr/ngx-auth-client';
 import { AuthType } from '@tmdjr/ngx-auth-client/enums/auth-type.enum';
 import {
-  WorkshopDocumentDto,
-  WorkshopDocumentIdentifierDto,
-} from 'src/workshop-document/dto/create.dto';
+  CreateWorkshopPageDto,
+  WorkshopPageDto,
+  WorkshopPageIdentifierDto,
+} from 'src/workshop-page/dto/create.dto';
 import {
   CreateWorkshopDto,
   DeleteResultDto,
@@ -70,9 +71,9 @@ export class NavigationController {
   @ApiOkResponse({ type: Workshop })
   async createPage(
     @Body()
-    { page, workshopId }: PageParamsDto
+    page: CreateWorkshopPageDto
   ) {
-    return await this.navigationService.createPage(page, workshopId);
+    return await this.navigationService.createPage(page);
   }
 
   @Post('page/delete-page-and-update-workshop')
@@ -91,7 +92,7 @@ export class NavigationController {
   @Post('page/edit-page-name-update-workshop')
   @Roles(Role.Admin)
   @ApiOkResponse({ type: WorkshopDto })
-  async editPageNameUpdateWorkshop(@Body() page: WorkshopDocumentDto) {
+  async editPageNameUpdateWorkshop(@Body() page: WorkshopPageDto) {
     return await this.navigationService.editPageNameUpdateWorkshop(page);
   }
 
@@ -99,7 +100,7 @@ export class NavigationController {
   @Post('page/sort-pages')
   @ApiOkResponse({ type: WorkshopDto })
   async sortPages(
-    @Body() pages: WorkshopDocumentIdentifierDto[],
+    @Body() pages: WorkshopPageIdentifierDto[],
     @Query('workshopId') workshopId: string
   ) {
     return await this.navigationService.sortPages(pages, workshopId);

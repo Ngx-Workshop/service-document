@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { WorkshopDocumentIdentifierDto } from 'src/workshop-document/dto/create.dto';
+import { WorkshopPageIdentifierDto } from 'src/workshop-page/dto/create.dto';
 
 export type TWorkshopDocument = HydratedDocument<Workshop>;
 
@@ -30,7 +30,7 @@ export class Workshop {
   thumbnail: string;
 
   @Prop()
-  workshopDocuments: WorkshopDocumentIdentifierDto[];
+  workshopDocuments: WorkshopPageIdentifierDto[];
 
   @Prop()
   workshopDocumentsLastUpdated: Date;

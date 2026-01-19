@@ -8,7 +8,7 @@ import {
   IsString,
 } from 'class-validator';
 
-export class WorkshopDocumentDto {
+export class WorkshopPageDto {
   @ApiProperty() _id: string;
 
   @ApiProperty()
@@ -32,7 +32,7 @@ export class WorkshopDocumentDto {
   @ApiProperty() __v: number;
 }
 
-export class CreateWorkshopDocumentDto {
+export class CreateWorkshopPageDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
@@ -67,13 +67,13 @@ export class CreateWorkshopDocumentDto {
   html?: string;
 }
 
-export class WorkshopDocumentIdentifierDto {
-  @ApiProperty({ description: 'Object id of the workshop-document.' })
+export class WorkshopPageIdentifierDto {
+  @ApiProperty({ description: 'Object id of the workshop-page.' })
   @IsString()
   @IsNotEmpty()
   _id: string;
 
-  @ApiProperty({ description: 'Display name of the workshop-document.' })
+  @ApiProperty({ description: 'Display name of the workshop-page.' })
   @IsString()
   @IsNotEmpty()
   name: string;

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { NavigationModule } from './navigation/navigation.module';
-import { WorkshopModule } from './workshop-document/workshop-document.module';
+import { WorkshopModule } from './workshop-page/workshop-page.module';
 
 const DB_IMPORTS =
   process.env.GENERATE_OPENAPI === 'true'

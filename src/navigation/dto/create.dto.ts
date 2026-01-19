@@ -14,9 +14,9 @@ import {
   ValidateNested,
 } from 'class-validator';
 import {
-  WorkshopDocumentDto,
-  WorkshopDocumentIdentifierDto,
-} from '../../workshop-document/dto/create.dto';
+  WorkshopPageDto,
+  WorkshopPageIdentifierDto,
+} from '../../workshop-page/dto/create.dto';
 
 export class SectionDto {
   @ApiProperty() _id: string;
@@ -86,8 +86,8 @@ export class WorkshopDto {
   @ApiProperty({ default: 'https://via.placeholder.com/250/400' })
   thumbnail: string;
 
-  @ApiProperty({ type: () => [WorkshopDocumentIdentifierDto] })
-  workshopDocuments: WorkshopDocumentIdentifierDto[];
+  @ApiProperty({ type: () => [WorkshopPageIdentifierDto] })
+  workshopDocuments: WorkshopPageIdentifierDto[];
 
   @ApiProperty({ type: String, format: 'date-time' })
   workshopDocumentsLastUpdated: Date;
@@ -129,12 +129,12 @@ export class CreateWorkshopDto {
   @IsOptional()
   thumbnail?: string;
 
-  @ApiPropertyOptional({ type: () => [WorkshopDocumentIdentifierDto] })
+  @ApiPropertyOptional({ type: () => [WorkshopPageIdentifierDto] })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => WorkshopDocumentIdentifierDto)
+  @Type(() => WorkshopPageIdentifierDto)
   @IsOptional()
-  workshopDocuments?: WorkshopDocumentIdentifierDto[];
+  workshopDocuments?: WorkshopPageIdentifierDto[];
 
   @ApiPropertyOptional({ type: String, format: 'date-time' })
   @IsDateString()
@@ -143,8 +143,8 @@ export class CreateWorkshopDto {
 }
 
 export class PageParamsDto {
-  @ApiProperty({ type: WorkshopDocumentDto })
-  page: WorkshopDocumentDto;
+  @ApiProperty({ type: WorkshopPageDto })
+  page: WorkshopPageDto;
 
   @ApiProperty()
   workshopId: string;
