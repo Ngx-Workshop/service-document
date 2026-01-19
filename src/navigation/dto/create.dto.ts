@@ -144,6 +144,8 @@ export class CreateWorkshopDto {
 
 export class PageParamsDto {
   @ApiProperty({ type: WorkshopPageDto })
+  @Type(() => WorkshopPageDto)
+  @ValidateNested()
   page: WorkshopPageDto;
 
   @ApiProperty()

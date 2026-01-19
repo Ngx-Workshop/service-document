@@ -82,7 +82,7 @@ export class NavigationController {
   async deletePageAndUpdateWorkshop(
     @Body()
     { page, workshopId }: PageParamsDto
-  ): Promise<{ acknowledged: boolean; deletedCount: number }> {
+  ): Promise<DeleteResultDto> {
     return await this.navigationService.deletePageAndUpdateWorkshop(
       page._id,
       workshopId
