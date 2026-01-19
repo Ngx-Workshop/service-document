@@ -139,7 +139,7 @@ export class CreateWorkshopDto {
   workshopDocumentsLastUpdated?: string;
 }
 
-export class DeletePageDto {
+export class DeletePageParamsDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
@@ -154,16 +154,6 @@ export class DeletePageDto {
   @IsString()
   @IsNotEmpty()
   name: string;
-}
-
-export class DeletePageParamsDto {
-  @ApiProperty({ type: DeletePageDto })
-  @Type(() => DeletePageDto)
-  @ValidateNested()
-  page: DeletePageDto;
-
-  @ApiProperty()
-  workshopId: string;
 }
 
 export class DeleteResultDto {

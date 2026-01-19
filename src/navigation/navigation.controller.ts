@@ -81,11 +81,11 @@ export class NavigationController {
   @ApiOkResponse({ type: DeleteResultDto })
   async deletePageAndUpdateWorkshop(
     @Body()
-    { page, workshopId }: DeletePageParamsDto
+    page: DeletePageParamsDto
   ): Promise<DeleteResultDto> {
     return await this.navigationService.deletePageAndUpdateWorkshop(
       page._id,
-      workshopId
+      page.workshopId
     );
   }
 
