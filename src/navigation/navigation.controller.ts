@@ -4,7 +4,7 @@ import { Auth, Role, Roles } from '@tmdjr/ngx-auth-client';
 import { AuthType } from '@tmdjr/ngx-auth-client/enums/auth-type.enum';
 import {
   CreateWorkshopPageDto,
-  WorkshopPageDto,
+  EditPageNameUpdateWorkshopDto,
   WorkshopPageIdentifierDto,
 } from 'src/workshop-page/dto/create.dto';
 import {
@@ -92,7 +92,9 @@ export class NavigationController {
   @Post('page/edit-page-name-update-workshop')
   @Roles(Role.Admin)
   @ApiOkResponse({ type: WorkshopDto })
-  async editPageNameUpdateWorkshop(@Body() page: WorkshopPageDto) {
+  async editPageNameUpdateWorkshop(
+    @Body() page: EditPageNameUpdateWorkshopDto
+  ) {
     return await this.navigationService.editPageNameUpdateWorkshop(page);
   }
 

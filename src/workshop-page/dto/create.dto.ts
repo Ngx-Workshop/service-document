@@ -90,3 +90,20 @@ export class WorkshopPageIdentifierDto {
   @IsNumber()
   sortId: number;
 }
+
+export class EditPageNameUpdateWorkshopDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  _id: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  workshopGroupId: string;
+}

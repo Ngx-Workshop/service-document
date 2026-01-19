@@ -7,7 +7,7 @@ import { WorkshopDocumentService } from '../workshop-page/workshop-page.service'
 
 import {
   CreateWorkshopPageDto,
-  WorkshopPageDto,
+  EditPageNameUpdateWorkshopDto,
   WorkshopPageIdentifierDto,
 } from 'src/workshop-page/dto/create.dto';
 import {
@@ -216,7 +216,7 @@ export class NavigationService {
     _id,
     name,
     workshopGroupId,
-  }: WorkshopPageDto): Promise<WorkshopDto> {
+  }: EditPageNameUpdateWorkshopDto): Promise<WorkshopDto> {
     const workshopDocumentBeforeUpdate =
       await this.workshopDocumentService.updateWorkshopName(_id, name);
     const newWorkshopDocument = {
