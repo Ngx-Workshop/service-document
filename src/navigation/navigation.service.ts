@@ -167,7 +167,7 @@ export class NavigationService {
     });
     const workshopDocumentId = this.toWorkshopDocumentId(workshop);
     const updatedWorkshop = await this.workshopModel.findByIdAndUpdate(
-      page.workshopGroupId,
+      page.workshopId,
       {
         $push: {
           workshopDocuments: {

@@ -36,6 +36,11 @@ export class CreateWorkshopPageDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  workshopId: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   workshopGroupId: string;
 
   @ApiPropertyOptional({ default: 'Page' })
