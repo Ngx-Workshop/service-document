@@ -36,33 +36,33 @@ jobs:
           npm run gen
           npm run build
 
-      # - name: Configure npm auth
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: '20'
-      #     registry-url: 'https://registry.npmjs.org'
-      #     scope: '@tmdjr'
-      #     always-auth: true
+      - name: Configure npm auth
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          scope: '@tmdjr'
+          always-auth: true
 
-      # - name: Publish contracts to NPM (document)
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      #   run: |
-      #     cd contracts/document
+      - name: Publish contracts to NPM (document)
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd contracts/document
 
-      #     # Deterministic version: "<major>.<minor>.<github.run_number>"
-      #     node - <<'NODE'
-      #     const fs = require('fs');
-      #     const pkgPath = './package.json';
-      #     const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-      #     const [maj, min] = String(pkg.version).split('.');
-      #     const uniquePatch = process.env.GITHUB_RUN_NUMBER || '0';
-      #     pkg.version = `${maj}.${min}.${uniquePatch}`;
-      #     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-      #     console.log('Publishing version', pkg.version);
-      #     NODE
+          # Deterministic version: "<major>.<minor>.<github.run_number>"
+          node - <<'NODE'
+          const fs = require('fs');
+          const pkgPath = './package.json';
+          const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+          const [maj, min] = String(pkg.version).split('.');
+          const uniquePatch = process.env.GITHUB_RUN_NUMBER || '0';
+          pkg.version = `${maj}.${min}.${uniquePatch}`;
+          fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+          console.log('Publishing version', pkg.version);
+          NODE
 
-      #     npm publish --access public
+          npm publish --access public
 
       - name: Upload OpenAPI artifact
         uses: actions/upload-artifact@v4
