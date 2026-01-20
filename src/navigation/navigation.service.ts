@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -30,7 +30,8 @@ export class NavigationService {
     @InjectModel(Section.name) private sectionModel: Model<SectionDocumentDoc>,
     @InjectModel(Workshop.name)
     private workshopModel: Model<TWorkshopDocument>,
-    private workshopDocumentService: WorkshopDocumentService
+    private workshopDocumentService: WorkshopDocumentService,
+    private logger: Logger
   ) {}
 
   async findAllSections(): Promise<SectionsMapDto> {
@@ -217,8 +218,16 @@ export class NavigationService {
     name,
     workshopGroupId,
   }: EditPageNameUpdateWorkshopDto): Promise<WorkshopDto> {
+    this.logger.log(
+      `Renaming page with ID ${_id} to "${name}" in workshop ${workshopGroupId}"`
+    );
     const workshopDocumentBeforeUpdate =
       await this.workshopDocumentService.updateWorkshopName(_id, name);
+
+    this.logger.log(
+      `Renamed page with ID ${_id} from "${workshopDocumentBeforeUpdate.name}" to "${name}"`
+    );
+
     const newWorkshopDocument = {
       _id,
       name,
@@ -229,6 +238,10 @@ export class NavigationService {
       name: workshopDocumentBeforeUpdate.name,
       sortId: workshopDocumentBeforeUpdate.sortId,
     };
+
+    this.logger.log(
+      `Updating workshop ${workshopGroupId} to reflect page name change...`
+    );
     const updatedWorkshop = await this.workshopModel.findByIdAndUpdate(
       workshopGroupId,
       { $set: { 'workshopDocuments.$[elem]': newWorkshopDocument } },
