@@ -211,30 +211,6 @@ export class NavigationService {
     name,
     workshopId,
   }: EditPageNameUpdateWorkshopDto): Promise<WorkshopDto> {
-    this.logger.log(
-      `Renaming page with ID ${_id} to "${name}" in workshop ${workshopId}"`
-    );
-    const workshopDocumentBeforeUpdate =
-      await this.workshopDocumentService.updateWorkshopName(_id, name);
-
-    this.logger.log(
-      `Renamed page with ID ${_id} from "${workshopDocumentBeforeUpdate.name}" to "${name}"`
-    );
-
-    const newWorkshopDocument = {
-      _id,
-      name,
-      sortId: workshopDocumentBeforeUpdate.sortId,
-    };
-    const oldWorkshopDocument = {
-      _id,
-      name: workshopDocumentBeforeUpdate.name,
-      sortId: workshopDocumentBeforeUpdate.sortId,
-    };
-
-    this.logger.log(
-      `Updating workshop ${workshopId} to reflect page name change...`
-    );
     const updatedWorkshop = await this.workshopModel.findOneAndUpdate(
       { _id: workshopId, 'workshopDocuments._id': _id },
       {
@@ -243,10 +219,8 @@ export class NavigationService {
           workshopDocumentsLastUpdated: new Date(),
         },
       },
-      { new: true } // <-- this is the Mongoose way
+      { new: true }
     );
-    this.logger.log(`Updated workshop ${workshopId} successfully.`);
-    this.logger.log(updatedWorkshop);
 
     if (!updatedWorkshop) {
       throw new NotFoundException('Workshop not found when renaming page');
