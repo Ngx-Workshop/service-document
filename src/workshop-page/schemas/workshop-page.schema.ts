@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 export type TWorkshopPageDocument = HydratedDocument<WorkshopPage>;
 
 @Schema()
 export class WorkshopPage {
-  @Prop({ required: true })
-  workshopGroupId: string;
+  @Prop({ type: Types.ObjectId, ref: 'Workshop', required: true })
+  workshopGroupId: Types.ObjectId;
 
   @Prop({ default: () => 'Page' })
   name: string;

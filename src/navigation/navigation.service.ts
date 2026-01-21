@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import { WorkshopPage } from '../workshop-page/schemas/workshop-page.schema';
 import { WorkshopDocumentService } from '../workshop-page/workshop-page.service';
@@ -26,12 +26,13 @@ import {
 
 @Injectable()
 export class NavigationService {
+  private logger = new Logger();
+
   constructor(
     @InjectModel(Section.name) private sectionModel: Model<SectionDocumentDoc>,
     @InjectModel(Workshop.name)
     private workshopModel: Model<TWorkshopDocument>,
-    private workshopDocumentService: WorkshopDocumentService,
-    private logger: Logger
+    private workshopDocumentService: WorkshopDocumentService
   ) {}
 
   async findAllSections(): Promise<SectionsMapDto> {
@@ -63,7 +64,7 @@ export class NavigationService {
     const newWorkshop = await this.workshopModel.create(workshop);
     const workshopDocument =
       await this.workshopDocumentService.createWorkshopDocument({
-        workshopGroupId: newWorkshop.workshopDocumentGroupId,
+        workshopGroupId: newWorkshop._id,
       });
     const workshopDocumentId = this.toWorkshopDocumentId(workshopDocument);
 
@@ -97,33 +98,24 @@ export class NavigationService {
       throw new NotFoundException('Workshop not found');
     }
 
-    const { workshopDocumentGroupId } = existingWorkshop;
-    const newWorkshopDocumentGroupId = toSpinalCase(workshop.name!);
-    const updateStatus =
-      await this.workshopDocumentService.updateWorkshopDocumentsByWorkshopGroupId(
-        workshopDocumentGroupId,
-        newWorkshopDocumentGroupId
-      );
-    if (updateStatus) {
-      const updatedWorkshop = await this.workshopModel.findByIdAndUpdate(
-        workshop._id,
-        {
-          name: workshop.name,
-          summary: workshop.summary,
-          thumbnail: workshop.thumbnail,
-          workshopDocumentGroupId: newWorkshopDocumentGroupId,
-        },
-        { returnDocument: 'after' }
-      );
+    const updatedWorkshop = await this.workshopModel.findByIdAndUpdate(
+      workshop._id,
+      {
+        name: workshop.name ?? existingWorkshop.name,
+        summary: workshop.summary ?? existingWorkshop.summary,
+        thumbnail: workshop.thumbnail ?? existingWorkshop.thumbnail,
+        workshopDocumentGroupId: toSpinalCase(
+          workshop.name ?? existingWorkshop.name
+        ),
+      },
+      { returnDocument: 'after' }
+    );
 
-      if (!updatedWorkshop) {
-        throw new NotFoundException('Workshop update failed');
-      }
-
-      return this.toWorkshopDto(updatedWorkshop);
+    if (!updatedWorkshop) {
+      throw new NotFoundException('Workshop update failed');
     }
 
-    throw new NotFoundException('Workshop documents could not be updated');
+    return this.toWorkshopDto(updatedWorkshop);
   }
 
   async deleteWorkshopAndWorkshopDocuments(
@@ -161,14 +153,15 @@ export class NavigationService {
   }
 
   async createPage(page: CreateWorkshopPageDto): Promise<WorkshopDto> {
-    const { lastUpdated, ...rest } = page;
+    const { lastUpdated, workshopId, ...rest } = page;
     const workshop = await this.workshopDocumentService.createWorkshopDocument({
       ...rest,
+      workshopGroupId: new Types.ObjectId(workshopId),
       lastUpdated: lastUpdated ? new Date(lastUpdated) : undefined,
     });
     const workshopDocumentId = this.toWorkshopDocumentId(workshop);
     const updatedWorkshop = await this.workshopModel.findByIdAndUpdate(
-      page.workshopId,
+      workshopId,
       {
         $push: {
           workshopDocuments: {
@@ -216,10 +209,10 @@ export class NavigationService {
   async editPageNameUpdateWorkshop({
     _id,
     name,
-    workshopGroupId,
+    workshopId,
   }: EditPageNameUpdateWorkshopDto): Promise<WorkshopDto> {
     this.logger.log(
-      `Renaming page with ID ${_id} to "${name}" in workshop ${workshopGroupId}"`
+      `Renaming page with ID ${_id} to "${name}" in workshop ${workshopId}"`
     );
     const workshopDocumentBeforeUpdate =
       await this.workshopDocumentService.updateWorkshopName(_id, name);
@@ -240,10 +233,10 @@ export class NavigationService {
     };
 
     this.logger.log(
-      `Updating workshop ${workshopGroupId} to reflect page name change...`
+      `Updating workshop ${workshopId} to reflect page name change...`
     );
     const updatedWorkshop = await this.workshopModel.findByIdAndUpdate(
-      workshopGroupId,
+      workshopId,
       { $set: { 'workshopDocuments.$[elem]': newWorkshopDocument } },
       {
         arrayFilters: [{ elem: { $eq: oldWorkshopDocument } }],

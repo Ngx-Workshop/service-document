@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsDateString,
+  IsMongoId,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -35,13 +36,9 @@ export class WorkshopPageDto {
 export class CreateWorkshopPageDto {
   @ApiProperty()
   @IsString()
+  @IsMongoId()
   @IsNotEmpty()
   workshopId: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  workshopGroupId: string;
 
   @ApiPropertyOptional({ default: 'Page' })
   @IsString()
@@ -105,5 +102,6 @@ export class EditPageNameUpdateWorkshopDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  workshopGroupId: string;
+  @IsMongoId()
+  workshopId: string;
 }

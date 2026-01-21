@@ -39,6 +39,7 @@ export class WorkshopDocumentService {
   async getWorkshopDocumentsByWorkshopGroupId(
     workshopGroupId: string
   ): Promise<WorkshopPage[]> {
+    this.ensureValidObjectId(workshopGroupId);
     return this.workshopDocumentModel.find({ workshopGroupId }).exec();
   }
 
@@ -46,6 +47,8 @@ export class WorkshopDocumentService {
     workshopGroupId: string,
     newWorkshopGroupId: string
   ): Promise<{ acknowledged: boolean }> {
+    this.ensureValidObjectId(workshopGroupId);
+    this.ensureValidObjectId(newWorkshopGroupId);
     return this.workshopDocumentModel
       .updateMany({ workshopGroupId }, { workshopGroupId: newWorkshopGroupId })
       .exec();
@@ -54,6 +57,10 @@ export class WorkshopDocumentService {
   async createWorkshopDocument(
     workshop: Partial<WorkshopPage>
   ): Promise<WorkshopPage> {
+    if (!workshop.workshopGroupId) {
+      throw new BadRequestException('workshopGroupId is required');
+    }
+    this.ensureValidObjectId(workshop.workshopGroupId.toString());
     return this.workshopDocumentModel.create(workshop);
   }
 
