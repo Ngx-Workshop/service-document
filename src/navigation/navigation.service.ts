@@ -244,6 +244,8 @@ export class NavigationService {
         returnDocument: 'after',
       }
     );
+    this.logger.log(`Updated workshop ${workshopId} successfully.`);
+    this.logger.log(updatedWorkshop);
 
     if (!updatedWorkshop) {
       throw new NotFoundException('Workshop not found when renaming page');
