@@ -235,14 +235,15 @@ export class NavigationService {
     this.logger.log(
       `Updating workshop ${workshopId} to reflect page name change...`
     );
-    const updatedWorkshop = await this.workshopModel.findByIdAndUpdate(
-      workshopId,
-      { $set: { 'workshopDocuments.$[elem]': newWorkshopDocument } },
+    const updatedWorkshop = await this.workshopModel.findOneAndUpdate(
+      { _id: workshopId, 'workshopDocuments._id': _id },
       {
-        arrayFilters: [{ elem: { $eq: oldWorkshopDocument } }],
-        multi: true,
-        returnDocument: 'after',
-      }
+        $set: {
+          'workshopDocuments.$.name': name,
+          workshopDocumentsLastUpdated: new Date(),
+        },
+      },
+      { new: true } // <-- this is the Mongoose way
     );
     this.logger.log(`Updated workshop ${workshopId} successfully.`);
     this.logger.log(updatedWorkshop);
