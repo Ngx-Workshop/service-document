@@ -1,0 +1,740 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/navigation/sections": {
+      "get": {
+        "operationId": "NavigationController_sections",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SectionsMapDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/workshops": {
+      "get": {
+        "operationId": "NavigationController_workshops",
+        "parameters": [
+          {
+            "name": "section",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Workshop"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/workshop/create-workshop": {
+      "post": {
+        "operationId": "NavigationController_createWorkshop",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkshopDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Workshop"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/workshop/edit-workshop-name-and-summary": {
+      "post": {
+        "operationId": "NavigationController_editWorkshopNameAndSummary",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWorkshopDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Workshop"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/workshop/delete-workshop-and-workshop-documents": {
+      "post": {
+        "operationId": "NavigationController_deleteWorkshopAndWorkshops",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteResultDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/workshop/sort-workshops": {
+      "post": {
+        "operationId": "NavigationController_sortWorkshops",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Workshop"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/page/create-page": {
+      "post": {
+        "operationId": "NavigationController_createPage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkshopPageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Workshop"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/page/delete-page-and-update-workshop": {
+      "post": {
+        "operationId": "NavigationController_deletePageAndUpdateWorkshop",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeletePageParamsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteResultDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/page/edit-page-name-update-workshop": {
+      "post": {
+        "operationId": "NavigationController_editPageNameUpdateWorkshop",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditPageNameUpdateWorkshopDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkshopDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/page/sort-pages": {
+      "post": {
+        "operationId": "NavigationController_sortPages",
+        "parameters": [
+          {
+            "name": "workshopId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkshopDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/workshop/health": {
+      "get": {
+        "operationId": "WorkshopController_health",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Workshop"
+        ]
+      }
+    },
+    "/workshop/workshops": {
+      "get": {
+        "operationId": "WorkshopController_workshops",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkshopPageDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Workshop"
+        ]
+      }
+    },
+    "/workshop/{objectId}": {
+      "get": {
+        "operationId": "WorkshopController_workshop",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkshopPageDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Workshop"
+        ]
+      }
+    },
+    "/workshop/update-workshop-html": {
+      "post": {
+        "operationId": "WorkshopController_updateWorkshopHtml",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkshopPageDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Workshop"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "NGX document API",
+    "description": "",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "SectionDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "sectionTitle": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "number"
+          },
+          "menuSvgPath": {
+            "type": "string"
+          },
+          "headerSvgPath": {
+            "type": "string"
+          },
+          "categoriesLastUpdated": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "_id",
+          "sectionTitle",
+          "summary",
+          "menuSvgPath",
+          "headerSvgPath",
+          "categoriesLastUpdated"
+        ]
+      },
+      "SectionsMapDto": {
+        "type": "object",
+        "properties": {
+          "sections": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SectionDto"
+            }
+          }
+        },
+        "required": [
+          "sections"
+        ]
+      },
+      "Workshop": {
+        "type": "object",
+        "properties": {}
+      },
+      "WorkshopPageIdentifierDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Object id of the workshop-page."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the workshop-page."
+          },
+          "sortId": {
+            "type": "number",
+            "description": "Position of the doc item in the section's list"
+          }
+        },
+        "required": [
+          "_id",
+          "name",
+          "sortId"
+        ]
+      },
+      "CreateWorkshopDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "sectionId": {
+            "type": "string"
+          },
+          "workshopDocumentGroupId": {
+            "type": "string"
+          },
+          "sortId": {
+            "type": "number",
+            "default": 0
+          },
+          "name": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "thumbnail": {
+            "type": "string",
+            "default": "https://via.placeholder.com/250/400"
+          },
+          "workshopDocuments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkshopPageIdentifierDto"
+            }
+          },
+          "workshopDocumentsLastUpdated": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "_id",
+          "sectionId",
+          "name",
+          "summary"
+        ]
+      },
+      "UpdateWorkshopDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "sectionId": {
+            "type": "string"
+          },
+          "workshopDocumentGroupId": {
+            "type": "string"
+          },
+          "sortId": {
+            "type": "number",
+            "default": 0
+          },
+          "name": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "thumbnail": {
+            "type": "string",
+            "default": "https://via.placeholder.com/250/400"
+          },
+          "workshopDocuments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkshopPageIdentifierDto"
+            }
+          },
+          "workshopDocumentsLastUpdated": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DeleteResultDto": {
+        "type": "object",
+        "properties": {
+          "acknowledged": {
+            "type": "boolean"
+          },
+          "deletedCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "acknowledged",
+          "deletedCount"
+        ]
+      },
+      "CreateWorkshopPageDto": {
+        "type": "object",
+        "properties": {
+          "workshopId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "default": "Page"
+          },
+          "sortId": {
+            "type": "number",
+            "default": 0
+          },
+          "pageType": {
+            "type": "string",
+            "default": "PAGE"
+          },
+          "lastUpdated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "html": {
+            "type": "string",
+            "description": "Serialized JSON of the document blocks"
+          }
+        },
+        "required": [
+          "workshopId"
+        ]
+      },
+      "DeletePageParamsDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "workshopId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "_id",
+          "workshopId",
+          "name"
+        ]
+      },
+      "EditPageNameUpdateWorkshopDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "workshopId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "_id",
+          "name",
+          "workshopId"
+        ]
+      },
+      "WorkshopDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "workshopDocumentGroupId": {
+            "type": "string"
+          },
+          "sectionId": {
+            "type": "string"
+          },
+          "sortId": {
+            "type": "number",
+            "default": 0
+          },
+          "name": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "thumbnail": {
+            "type": "string",
+            "default": "https://via.placeholder.com/250/400"
+          },
+          "workshopDocuments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkshopPageIdentifierDto"
+            }
+          },
+          "workshopDocumentsLastUpdated": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "_id",
+          "workshopDocumentGroupId",
+          "sectionId",
+          "sortId",
+          "name",
+          "summary",
+          "thumbnail",
+          "workshopDocuments",
+          "workshopDocumentsLastUpdated"
+        ]
+      },
+      "WorkshopPageDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "workshopGroupId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "default": "Page"
+          },
+          "sortId": {
+            "type": "number",
+            "default": 0
+          },
+          "pageType": {
+            "type": "string",
+            "default": "PAGE"
+          },
+          "lastUpdated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "html": {
+            "type": "string",
+            "description": "Serialized JSON of the document blocks"
+          },
+          "__v": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "_id",
+          "workshopGroupId",
+          "name",
+          "sortId",
+          "pageType",
+          "lastUpdated",
+          "html",
+          "__v"
+        ]
+      }
+    }
+  }
+}
