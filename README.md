@@ -1,6 +1,6 @@
-# <img src="https://avatars.githubusercontent.com/u/208402795?s=400&u=23512ed7ee1e7e6635cdd802d7551f5da765d374&v=4" width="60px" /> Document Service (NestJS)
+# Document Service (NestJS) <img src="https://avatars.githubusercontent.com/u/208402795?s=400&u=23512ed7ee1e7e6635cdd802d7551f5da765d374&v=4" height="56x" /> <img src="https://github.com/Ngx-Workshop/.github/blob/main/readme-assets/nestjs-logo.webp?raw=true" height="56" alt="Nest Logo" />
 
-<img src="https://nestjs.com/img/logo-small.svg" width="16" alt="Nest Logo" /> **NestJS web service that backs the NGX Workshop "document" domain.**
+**NestJS web service that backs the NGX Workshop "document" domain.**
 
 It exposes REST endpoints for:
 
