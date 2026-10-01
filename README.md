@@ -1,150 +1,35 @@
-# Webservice Workshop Documents
+# Workshop document service
 
-<p align="center">
-<img src="https://github.com/Ngx-Workshop/.github/blob/main/readme-assets/nestjs-logo.webp?raw=true" height="84" alt="Nest Logo" />
-</p>
-<p align="center">
-<img src="https://github.com/Ngx-Workshop/.github/blob/main/readme-assets/mongodb-logo.svg?raw=true" height="84" alt="MongoDB Logo" />
-</p>
+NestJS and MongoDB service for Ngx-Workshop sections, workshop metadata, ordered
+page references and serialized editor blocks. Navigation/page reads can be public;
+mutations declare administrator access through the shared auth guards.
 
-**NestJS web service that backs the NGX Workshop "document" domain.**
+Start with [AGENTS.md](AGENTS.md) for the repository context and working rules.
 
-It exposes REST endpoints for:
+- [Architecture and data ownership](docs/architecture.md)
+- [Development, generation and verification](docs/development.md)
+- [HTTP contract map](docs/api-contracts.md)
+- [Current gaps and readiness](docs/document-readiness.md)
+- [Specification workflow](.specify/README.md), [constitution](.specify/memory/constitution.md)
+  and [feature index](specs/README.md)
+- [Migration record](docs/seed-adoption.md)
 
-- **Navigation**: listing sections + workshops, plus admin-only workshop/page management
-- **Workshop pages**: read/update the serialized page document (stored as JSON string)
+## Development
 
-Data is stored in **MongoDB** via **Mongoose**.
+Use Node 22, npm ci, a reachable test MongoDB and the external authentication service.
+Configure MONGODB_URI, AUTH_BASE_URL and optionally PORT (default 3007), then use
+npm run start:dev. Compose requires an external ngx-net network and .env; it does
+not start MongoDB. See the development guide for existing compiler/test blockers.
 
-## Quickstart
+## Contracts
 
-### Local (Node.js)
+Service routes begin /navigation and /workshop; browser consumers use the gateway
+prefix /api/documents. The html field stores serialized JSON blocks. Swagger and
+TypeScript contracts are generated locally; launch generation with
+GENERATE_OPENAPI=true set before module import. Checked-in generated contracts have
+known drift and a compilation error documented in the development guide.
 
-Prereqs:
-
-- Node.js 22+
-- A reachable MongoDB instance
-
-1. Install deps
-
-```bash
-npm ci
-```
-
-2. Configure environment
-
-Create a `.env` in the repo root (or export variables in your shell):
-
-```bash
-MONGODB_URI=mongodb://localhost:27017/document
-PORT=3007
-```
-
-3. Start dev server
-
-```bash
-npm run start:dev
-```
-
-The service listens on `0.0.0.0:${PORT}` (defaults to `3007`).
-
-### Docker
-
-This repo includes a compose file that runs the API container. It expects:
-
-- a `.env` file (for `MONGODB_URI`, etc.)
-- an **external** Docker network named `ngx-net`
-
-1. Create the network (one-time):
-
-```bash
-docker network create ngx-net
-```
-
-2. Bring the service up:
-
-```bash
-docker compose up --build
-```
-
-Note: the compose file does **not** start MongoDB. You can run Mongo separately (locally or in Docker) as long as `MONGODB_URI` is reachable from the container.
-
-## Configuration
-
-Environment variables used directly by this codebase:
-
-- `MONGODB_URI` (required at runtime): Mongo connection string.
-- `PORT` (optional): HTTP port, default `3007`.
-- `GENERATE_OPENAPI` (internal): when set to `true`, the app skips DB wiring and stubs Mongoose models/guards for OpenAPI generation.
-
-Authentication/authorization:
-
-- The service integrates `@tmdjr/ngx-auth-client` guards (`AuthenticationGuard`, `RemoteAuthGuard`, `RolesGuard`).
-- Endpoints annotated with `@Auth(AuthType.None)` are public.
-- Mutating endpoints are protected with `@Roles(Role.Admin)`.
-
-## API overview
-
-Primary route groups:
-
-- `GET /navigation/sections` (public)
-- `GET /navigation/workshops?section=<sectionId>` (public)
-- `POST /navigation/workshop/*` (admin)
-- `POST /navigation/page/*` (admin)
-- `GET /workshop/health`
-- `GET /workshop/workshops` (auth guard)
-- `GET /workshop/:objectId` (public)
-- `POST /workshop/update-workshop-html` (admin)
-
-The repository includes a generated OpenAPI spec at `openapi.json`.
-
-## Architecture
-
-### High-level module layout
-
-- `AppModule`
-  - Loads configuration via `@nestjs/config`
-  - Connects to MongoDB via `@nestjs/mongoose` (skipped when generating OpenAPI)
-  - Imports feature modules:
-    - `NavigationModule`
-    - `WorkshopModule` (workshop-page)
-
-### Data model (MongoDB)
-
-- **Section**: top-level grouping used for navigation.
-- **Workshop**: metadata (name/summary/thumbnail) plus an ordered list of “pages” (`workshopDocuments`).
-- **WorkshopPage**: the actual page document; stored as fields like `name`, `sortId`, and `html` (a serialized JSON string).
-
-Relationships:
-
-- A `Workshop` holds `workshopDocuments[]` identifiers (id, name, sort order).
-- `WorkshopPage.workshopGroupId` links a page to its parent workshop.
-
-### Request validation
-
-Global `ValidationPipe` is enabled with:
-
-- `whitelist: true`
-- `forbidNonWhitelisted: true`
-
-So DTOs strictly control payload shape.
-
-## OpenAPI + client contracts
-
-OpenAPI is generated by running the compiled script:
-
-- `npm run build` triggers `postbuild` which runs `node dist/swagger.js` and writes `openapi.json`.
-
-TypeScript contracts are generated and published from `contracts/document`:
-
-- `npm run contracts:document:gen`
-- `npm run contracts:document:build`
-- `npm run contracts:document:publish`
-
-## Scripts
-
-- `npm run start:dev`: run in watch mode
-- `npm run build`: compile to `dist/` (also regenerates `openapi.json`)
-- `npm run start:prod`: run compiled server
-- `npm run lint`: eslint autofix
-- `npm test`, `npm run test:e2e`: tests
+The global ValidationPipe validates decorated DTOs; inline bodies and bare arrays
+still have validation gaps. Admin decorators do not establish that auth integration
+has been tested. The local readiness review distinguishes current code from desired
+integrity, validation and compatibility guarantees.
