@@ -33,3 +33,12 @@ The global ValidationPipe validates decorated DTOs; inline bodies and bare array
 still have validation gaps. Admin decorators do not establish that auth integration
 has been tested. The local readiness review distinguishes current code from desired
 integrity, validation and compatibility guarantees.
+
+## Isolated local development
+
+With MongoDB on 127.0.0.1:27017, run npm run start:local in service-document and
+npm run dev:bundle in mfe-user-journey-admin-document-editor. Set the document editor
+Dev Mode remote entry to http://localhost:4202/remoteEntry.js, then open
+https://admin.ngx-workshop.io/document-editor.
+The local API uses 3007 and the isolated document_local database; production keeps
+its existing auth and API URLs. See [setup and hosted bundle instructions](docs/development.md).

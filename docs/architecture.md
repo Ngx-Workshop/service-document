@@ -19,14 +19,17 @@ TypeScript is ~5.7.3 with strictNullChecks but noImplicitAny disabled.
 | Metadata | src/navigation/dto/, schemas/ | Request/response DTOs, Section and Workshop schemas |
 | Page content | src/workshop-page/workshop-page.controller.ts, workshop-page.service.ts | Page reads, content saves and persistence helpers |
 | Page schema | src/workshop-page/dto/, schemas/ | Page payloads and JSON block defaults |
-| Auth wiring | Feature module files | Global AuthenticationGuard/RolesGuard and generation-only providers |
+| Auth wiring | Feature module files | DocumentAuthGuard wrapper, RolesGuard and generation-only providers |
 | Contracts | src/swagger.ts, openapi.json, contracts/document/ | Schema generation and publishable types |
 | Operations | Dockerfile, docker-compose.yml, .github/workflows/deploy.yml | Build, contract publication and deployment |
 
 ## Data and operations
 
 Section stores sectionTitle, numeric summary, icon paths and categoriesLastUpdated.
-Its schema declares _id as ObjectId. No section creation/update controller is exposed.
+Its schema defaults new _id values to ObjectIds; existing keys are unchanged.
+Admin POST /navigation/section/create-section accepts a trimmed sectionTitle (1–120
+characters), with numeric summary 0, empty artwork paths and a server timestamp.
+No section update/delete controller is exposed.
 Workshop stores sectionId, slug, metadata, sortId, embedded workshopDocuments and
 workshopDocumentsLastUpdated. A pre-save hook creates the name-derived slug; rename
 sets it explicitly. No uniqueness declaration protects this slug.
@@ -43,9 +46,10 @@ consequences and verification needs rather than claiming atomicity.
 ## API, authentication and validation
 
 See [HTTP contracts](api-contracts.md). Both modules register global auth/role
-guards. Sections, workshop lists and individual page reads explicitly allow public
+guards. DocumentAuthGuard delegates to AuthenticationGuard normally; explicit local
+mode is restricted to loopback/document_local and injects a synthetic admin. Sections, workshop lists and individual page reads explicitly allow public
 access; writes require Admin. Health is not explicitly public. The listing of all
-pages also applies RemoteAuthGuard. External auth integration is not verified here.
+pages also applies DocumentAuthGuard. External auth integration is not verified here.
 
 ValidationPipe uses whitelist and forbidNonWhitelisted, but that does not validate
 inline object bodies or array elements automatically. Transformation is not globally

@@ -1,5 +1,9 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { ApiExtraModels, ApiOkResponse } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiExtraModels,
+  ApiOkResponse,
+} from '@nestjs/swagger';
 import { Auth, Role, Roles } from '@tmdjr/ngx-auth-client';
 import { AuthType } from '@tmdjr/ngx-auth-client/enums/auth-type.enum';
 import {
@@ -8,6 +12,7 @@ import {
   WorkshopPageIdentifierDto,
 } from 'src/workshop-page/dto/create.dto';
 import {
+  CreateSectionDto,
   CreateWorkshopDto,
   DeletePageParamsDto,
   DeleteResultDto,
@@ -26,9 +31,16 @@ export class NavigationController {
 
   @Get('sections')
   @Auth(AuthType.None)
-  @ApiOkResponse({ type: SectionsMapDto, isArray: true })
+  @ApiOkResponse({ type: SectionsMapDto })
   sections() {
     return this.navigationService.findAllSections();
+  }
+
+  @Post('section/create-section')
+  @Roles(Role.Admin)
+  @ApiCreatedResponse({ type: SectionDto })
+  createSection(@Body() section: CreateSectionDto): Promise<SectionDto> {
+    return this.navigationService.createSection(section);
   }
 
   @Get('workshops')

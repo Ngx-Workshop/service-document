@@ -2,13 +2,13 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type WorkshopDocumentIdentifierDto = {
+export type WorkshopPageIdentifierDto = {
     /**
-     * Object id of the workshop-document.
+     * Object id of the workshop-page.
      */
     _id: string;
     /**
-     * Display name of the workshop-document.
+     * Display name of the workshop-page.
      */
     name: string;
     /**

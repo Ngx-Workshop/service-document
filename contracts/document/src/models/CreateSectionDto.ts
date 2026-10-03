@@ -2,4 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type Workshop = {};
+export type CreateSectionDto = {
+    /**
+     * Display name of the section
+     */
+    sectionTitle: string;
+};
+

@@ -11,6 +11,7 @@ import {
   WorkshopPageIdentifierDto,
 } from 'src/workshop-page/dto/create.dto';
 import {
+  CreateSectionDto,
   CreateWorkshopDto,
   SectionDto,
   SectionsMapDto,
@@ -34,6 +35,20 @@ export class NavigationService {
     private workshopModel: Model<TWorkshopDocument>,
     private workshopDocumentService: WorkshopDocumentService
   ) {}
+
+  async createSection(input: CreateSectionDto): Promise<SectionDto> {
+    const section = await this.sectionModel.create({
+      sectionTitle: input.sectionTitle,
+    });
+    return {
+      _id: section._id.toString(),
+      sectionTitle: section.sectionTitle,
+      summary: section.summary,
+      menuSvgPath: section.menuSvgPath,
+      headerSvgPath: section.headerSvgPath,
+      categoriesLastUpdated: section.categoriesLastUpdated,
+    };
+  }
 
   async findAllSections(): Promise<SectionsMapDto> {
     const sections = await this.sectionModel.find().lean().exec();

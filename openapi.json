@@ -11,10 +11,38 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SectionsMapDto"
-                  }
+                  "$ref": "#/components/schemas/SectionsMapDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/section/create-section": {
+      "post": {
+        "operationId": "NavigationController_createSection",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSectionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SectionDto"
                 }
               }
             }
@@ -448,6 +476,20 @@
         },
         "required": [
           "sections"
+        ]
+      },
+      "CreateSectionDto": {
+        "type": "object",
+        "properties": {
+          "sectionTitle": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120,
+            "description": "Display name of the section"
+          }
+        },
+        "required": [
+          "sectionTitle"
         ]
       },
       "Workshop": {

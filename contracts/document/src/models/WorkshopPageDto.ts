@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type WorkshopDocumentDto = {
+export type WorkshopPageDto = {
     _id: string;
     workshopGroupId: string;
     name: string;

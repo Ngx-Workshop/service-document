@@ -1,9 +1,9 @@
+import { DocumentAuthGuard } from '../local-development/document-auth.guard';
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { getModelToken, MongooseModule } from '@nestjs/mongoose';
 import {
-  AuthenticationGuard,
   NgxAuthClientModule,
   RemoteAuthGuard,
   RolesGuard,
@@ -53,7 +53,7 @@ const FAKE_PROVIDERS =
     WorkshopDocumentService,
     {
       provide: APP_GUARD,
-      useClass: AuthenticationGuard,
+      useClass: DocumentAuthGuard,
     },
     {
       provide: APP_GUARD,

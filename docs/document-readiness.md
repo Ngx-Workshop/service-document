@@ -27,3 +27,11 @@ These recommendations do not authorize publishing, deployment or all listed fixe
 See [contracts](api-contracts.md) for delivery order and [development](development.md)
 for actual verification evidence. Use an isolated test database for future destructive
 CRUD acceptance checks; auth and gateway validation require their real integrations.
+
+## Section creation update — 2026-10-03
+
+[001 Create sections](../specs/001-create-sections/handoff.md) implements named section
+creation and dynamic ID-based catalog links, resolving the static catalog portion
+of UI-02/API-03. Section-list Swagger shape is corrected and contracts regenerated,
+including the missing-model build repair. Existing workshop slug and unrelated
+validation/CRUD findings remain open. Live integration acceptance is still pending.

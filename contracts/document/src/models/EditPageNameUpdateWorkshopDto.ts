@@ -2,9 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { WorkshopDocumentDto } from './WorkshopDocumentDto';
-export type PageParamsDto = {
-    page: WorkshopDocumentDto;
+export type EditPageNameUpdateWorkshopDto = {
+    _id: string;
+    name: string;
     workshopId: string;
 };
 

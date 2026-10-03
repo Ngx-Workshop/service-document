@@ -3,9 +3,10 @@ import {
   ApiPropertyOptional,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
+  MaxLength,
   IsDateString,
   IsNotEmpty,
   IsNumber,
@@ -35,31 +36,18 @@ export class SectionDto {
 }
 
 export class CreateSectionDto {
-  @ApiPropertyOptional()
+  @ApiProperty({
+    minLength: 1,
+    maxLength: 120,
+    description: 'Display name of the section',
+  })
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value
+  )
   @IsString()
-  @IsOptional()
-  sectionTitle?: string;
-
-  @ApiPropertyOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @IsOptional()
-  summary?: number;
-
-  @ApiPropertyOptional()
-  @IsString()
-  @IsOptional()
-  menuSvgPath?: string;
-
-  @ApiPropertyOptional()
-  @IsString()
-  @IsOptional()
-  headerSvgPath?: string;
-
-  @ApiPropertyOptional({ type: String })
-  @IsString()
-  @IsOptional()
-  categoriesLastUpdated?: string;
+  @IsNotEmpty()
+  @MaxLength(120)
+  sectionTitle: string;
 }
 
 export class WorkshopDto {

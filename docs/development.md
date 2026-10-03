@@ -1,5 +1,52 @@
 # Document service development
 
+## Local document workflow (2026-10-03)
+
+This mirrors the assessment repositories, using document-specific ports and data.
+Prerequisite: MongoDB listening on 127.0.0.1:27017. After npm ci in each repository,
+run these commands in separate terminals:
+
+```bash
+# service-document
+npm run start:local
+```
+
+```bash
+# mfe-user-journey-admin-document-editor
+npm run dev:bundle
+```
+
+Open the MFE Orchestrator at https://admin.ngx-workshop.io/list-mfe-remotes. For the
+document editor, open the code-icon Dev Mode Options, enable Dev Mode, and set
+Remote Entry Point to http://localhost:4202/remoteEntry.js. Then open
+https://admin.ngx-workshop.io/document-editor and reload after changes. The override
+applies only to your browser; the global registry is unchanged. The document API is http://localhost:3007; data is stored
+only in mongodb://127.0.0.1:27017/document_local. Port 4202 avoids the assessment
+remote on 4201. This database starts empty; use Create Section, then Create New
+Workshop. No production records are copied or required.
+
+The local service sets DOCUMENT_LOCAL_DEV=true and NODE_ENV=development, overrides
+MONGODB_URI/PORT, binds only to loopback and supplies local-document-admin. It rejects
+other database URIs, non-loopback peers and unapproved origins. CORS allows
+https://admin.ngx-workshop.io, http://localhost:4202 and http://127.0.0.1:4202.
+Production mode and normal start:dev retain the platform authentication guard and
+public-route metadata. Do not tunnel or reverse-proxy local auth mode.
+
+The signed-in hosted shell owns routing and authentication. The root App remains
+empty and the exported Routes retain userAuthenticatedGuard. Development bundles
+use environment.development.ts for localhost:3007; production bundles use
+/api/documents. Port 4202 serves assets, not a standalone editor.
+Build production into a separate folder while the bundle watcher runs:
+npm run build -- --output-path /tmp/document-editor-production-check.
+
+All navigation, content, mutation and upload requests use the environment API base.
+The service has no uploader endpoint: image URL entry works, local file uploads
+require the external uploader and are outside this setup.
+
+Verified: 29 service tests, 8 browser unit/component tests, production builds,
+production API URL isolation and live browser/HTTP checks against local MongoDB.
+See [local setup handoff](../specs/002-local-development/handoff.md) for scope and limits.
+
 ## Setup
 
 CI and Docker use Node 22. Install locked dependencies with npm ci. Runtime needs
@@ -13,11 +60,11 @@ external ngx-net network; it does not supply MongoDB or the auth service.
 | --- | --- |
 | npm run start:dev | Runtime watch server; MongoDB/auth configuration required |
 | npm run start:prod | node dist/main; build first |
-| GENERATE_OPENAPI=true npm run build | Compile then run postbuild OpenAPI generation; current compiler config has a known blocker |
+| GENERATE_OPENAPI=true npm run build | Compile then run postbuild OpenAPI generation; Nest build passes (direct tsc config issue remains) |
 | GENERATE_OPENAPI=true npm run openapi | Generate openapi.json from existing dist; build it from current source first |
 | npm run contracts:document:gen | Generate types/models from local openapi.json |
 | npm run contracts:document:build | Compile generated package |
-| npm test -- --runInBand | Jest unit suite; no src spec files currently exist |
+| npm test -- --runInBand | Jest suite; section creation HTTP/guard/validation checks |
 | npm run test:e2e -- --runInBand | Inherited root-route test; not representative of document API |
 | ./node_modules/.bin/eslint 'src/**/*.ts' 'test/**/*.ts' | Read-only lint check; npm run lint applies fixes |
 | ./node_modules/.bin/tsc --noEmit --incremental false -p tsconfig.build.json | Read-only service typecheck |
@@ -61,3 +108,14 @@ Use focused mocked service tests plus an isolated MongoDB integration suite for
 relationship/cascade behavior. Check public and authenticated requests through the
 gateway separately. A TCP startup probe does not establish API correctness.
 See [readiness](document-readiness.md) and [HTTP contracts](api-contracts.md).
+
+## Section creation verification — 2026-10-03
+
+Both production builds, service OpenAPI/contract generation and contract compilation
+pass. Service tests: 15 passing; editor ChromeHeadless tests: 6 passing. Service tests
+mock persistence and remote identity while exercising real validation/schema defaults
+and role enforcement. Editor tests mock HTTP. No live database, auth or gateway test
+was performed. See [feature handoff](../specs/001-create-sections/handoff.md).
+Earlier migration results above are historical; generated-contract compilation now
+passes, while the direct TypeScript deleteOutDir configuration issue remains separate
+from the successful Nest production build.

@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { WorkshopDocumentIdentifierDto } from './WorkshopDocumentIdentifierDto';
+import type { WorkshopPageIdentifierDto } from './WorkshopPageIdentifierDto';
 export type WorkshopDto = {
   _id: string;
   workshopDocumentGroupId: string;
@@ -11,6 +11,6 @@ export type WorkshopDto = {
   name: string;
   summary: string;
   thumbnail: string;
-  workshopDocuments: Array<WorkshopDocumentIdentifierDto>;
+  workshopDocuments: Array<WorkshopPageIdentifierDto>;
   workshopDocumentsLastUpdated: string;
 };

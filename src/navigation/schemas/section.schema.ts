@@ -5,22 +5,22 @@ export type SectionDocumentDoc = Section & Document;
 
 @Schema()
 export class Section {
-  @Prop()
+  @Prop({ type: Types.ObjectId, default: () => new Types.ObjectId() })
   _id: Types.ObjectId;
 
-  @Prop()
+  @Prop({ required: true, trim: true, maxlength: 120 })
   sectionTitle: string;
 
-  @Prop()
+  @Prop({ default: 0 })
   summary: number;
 
-  @Prop()
+  @Prop({ default: '' })
   menuSvgPath: string;
 
-  @Prop()
+  @Prop({ default: '' })
   headerSvgPath: string;
 
-  @Prop()
+  @Prop({ default: () => new Date().toISOString() })
   categoriesLastUpdated: string;
 }
 
