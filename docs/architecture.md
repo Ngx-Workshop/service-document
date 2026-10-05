@@ -1,6 +1,6 @@
 # Document service architecture
 
-Source baseline: ec50bd0 · Reviewed 2026-10-01.
+Source baseline: ec50bd0 · Section CRUD updated 2026-10-05.
 
 ## Responsibility and stack
 
@@ -26,10 +26,16 @@ TypeScript is ~5.7.3 with strictNullChecks but noImplicitAny disabled.
 ## Data and operations
 
 Section stores sectionTitle, numeric summary, icon paths and categoriesLastUpdated.
-Its schema defaults new _id values to ObjectIds; existing keys are unchanged.
+Its mixed _id schema accepts legacy string keys and defaults new values to
+ObjectIds; existing keys are unchanged.
 Admin POST /navigation/section/create-section accepts a trimmed sectionTitle (1–120
 characters), with numeric summary 0, empty artwork paths and a server timestamp.
-No section update/delete controller is exposed.
+Public GET /navigation/section/:id returns one SectionDto. Admin PATCH on the
+same path accepts title, numeric summary and both SVG paths, preserving omitted
+fields and setting a server timestamp. Admin DELETE removes an empty section,
+returning DeleteResultDto; nonempty sections return 409 and missing sections 404.
+The workshop existence check and deletion are separate operations: concurrent
+workshop creation is not coordinated and may race deletion. No cascade occurs.
 Workshop stores sectionId, slug, metadata, sortId, embedded workshopDocuments and
 workshopDocumentsLastUpdated. A pre-save hook creates the name-derived slug; rename
 sets it explicitly. No uniqueness declaration protects this slug.

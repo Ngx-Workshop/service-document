@@ -1,7 +1,19 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import {
   ApiCreatedResponse,
+  ApiBadRequestResponse,
+  ApiConflictResponse,
   ApiExtraModels,
+  ApiNotFoundResponse,
   ApiOkResponse,
 } from '@nestjs/swagger';
 import { Auth, Role, Roles } from '@tmdjr/ngx-auth-client';
@@ -17,10 +29,11 @@ import {
   DeletePageParamsDto,
   DeleteResultDto,
   SectionDto,
+  SectionParamsDto,
   SectionsMapDto,
   WorkshopDto,
 } from './dto/create.dto';
-import { UpdateWorkshopDto } from './dto/update.dto';
+import { UpdateSectionDto, UpdateWorkshopDto } from './dto/update.dto';
 import { NavigationService } from './navigation.service';
 import { Workshop } from './schemas/workshop.schema';
 
@@ -41,6 +54,37 @@ export class NavigationController {
   @ApiCreatedResponse({ type: SectionDto })
   createSection(@Body() section: CreateSectionDto): Promise<SectionDto> {
     return this.navigationService.createSection(section);
+  }
+
+  @Get('section/:id')
+  @Auth(AuthType.None)
+  @ApiOkResponse({ type: SectionDto })
+  @ApiBadRequestResponse({ description: 'Invalid section key' })
+  @ApiNotFoundResponse({ description: 'Section not found' })
+  section(@Param() params: SectionParamsDto): Promise<SectionDto> {
+    return this.navigationService.findSection(params.id);
+  }
+
+  @Patch('section/:id')
+  @Roles(Role.Admin)
+  @ApiOkResponse({ type: SectionDto })
+  @ApiBadRequestResponse({ description: 'Invalid section key or update' })
+  @ApiNotFoundResponse({ description: 'Section not found' })
+  updateSection(
+    @Param() params: SectionParamsDto,
+    @Body() section: UpdateSectionDto
+  ): Promise<SectionDto> {
+    return this.navigationService.updateSection(params.id, section);
+  }
+
+  @Delete('section/:id')
+  @Roles(Role.Admin)
+  @ApiOkResponse({ type: DeleteResultDto })
+  @ApiBadRequestResponse({ description: 'Invalid section key' })
+  @ApiNotFoundResponse({ description: 'Section not found' })
+  @ApiConflictResponse({ description: 'Section contains workshops' })
+  deleteSection(@Param() params: SectionParamsDto): Promise<DeleteResultDto> {
+    return this.navigationService.deleteSection(params.id);
   }
 
   @Get('workshops')

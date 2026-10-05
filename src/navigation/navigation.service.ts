@@ -1,4 +1,11 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
@@ -13,11 +20,12 @@ import {
 import {
   CreateSectionDto,
   CreateWorkshopDto,
+  DeleteResultDto,
   SectionDto,
   SectionsMapDto,
   WorkshopDto,
 } from './dto/create.dto';
-import { UpdateWorkshopDto } from './dto/update.dto';
+import { UpdateSectionDto, UpdateWorkshopDto } from './dto/update.dto';
 import { Section, SectionDocumentDoc } from './schemas/section.schema';
 import {
   TWorkshopDocument,
@@ -40,6 +48,87 @@ export class NavigationService {
     const section = await this.sectionModel.create({
       sectionTitle: input.sectionTitle,
     });
+    return this.toSectionDto(section);
+  }
+
+  async findSection(id: string): Promise<SectionDto> {
+    const section = await this.sectionModel
+      .findOne(this.sectionFilter(id))
+      .exec();
+    if (!section) {
+      throw new NotFoundException('Section not found');
+    }
+    return this.toSectionDto(section);
+  }
+
+  async updateSection(
+    id: string,
+    input: UpdateSectionDto
+  ): Promise<SectionDto> {
+    const changes = Object.fromEntries(
+      Object.entries({
+        sectionTitle: input.sectionTitle,
+        summary: input.summary,
+        menuSvgPath: input.menuSvgPath,
+        headerSvgPath: input.headerSvgPath,
+      }).filter(([, value]) => value !== undefined)
+    );
+    if (Object.keys(changes).length === 0) {
+      throw new BadRequestException('At least one section field is required');
+    }
+    const section = await this.sectionModel
+      .findOneAndUpdate(
+        this.sectionFilter(id),
+        {
+          $set: { ...changes, categoriesLastUpdated: new Date().toISOString() },
+        },
+        { returnDocument: 'after', runValidators: true }
+      )
+      .exec();
+    if (!section) {
+      throw new NotFoundException('Section not found');
+    }
+    return this.toSectionDto(section);
+  }
+
+  async deleteSection(id: string): Promise<DeleteResultDto> {
+    const section = await this.sectionModel
+      .findOne(this.sectionFilter(id))
+      .exec();
+    if (!section) {
+      throw new NotFoundException('Section not found');
+    }
+    const sectionId = section._id.toString();
+    if (await this.workshopModel.exists({ sectionId }).exec()) {
+      throw new ConflictException('Section contains workshops');
+    }
+    const result = await this.sectionModel
+      .deleteOne({ _id: section._id })
+      .exec();
+    if (!result.acknowledged) {
+      throw new InternalServerErrorException(
+        'Section deletion was not acknowledged'
+      );
+    }
+    if (result.deletedCount === 0) {
+      throw new NotFoundException('Section not found');
+    }
+    return {
+      acknowledged: result.acknowledged,
+      deletedCount: result.deletedCount,
+    };
+  }
+
+  private sectionFilter(id: string) {
+    // Mixed IDs preserve legacy keys without casting them to ObjectIds.
+    const keys: (string | Types.ObjectId)[] = [id];
+    if (Types.ObjectId.isValid(id)) {
+      keys.push(new Types.ObjectId(id));
+    }
+    return { _id: { $in: keys } };
+  }
+
+  private toSectionDto(section: Section): SectionDto {
     return {
       _id: section._id.toString(),
       sectionTitle: section.sectionTitle,

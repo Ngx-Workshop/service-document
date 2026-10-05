@@ -53,6 +53,132 @@
         ]
       }
     },
+    "/navigation/section/{id}": {
+      "get": {
+        "operationId": "NavigationController_section",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Section key: a Mongo ObjectId string or a legacy string key",
+            "schema": {
+              "minLength": 1,
+              "maxLength": 120,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SectionDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid section key"
+          },
+          "404": {
+            "description": "Section not found"
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      },
+      "patch": {
+        "operationId": "NavigationController_updateSection",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Section key: a Mongo ObjectId string or a legacy string key",
+            "schema": {
+              "minLength": 1,
+              "maxLength": 120,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSectionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SectionDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid section key or update"
+          },
+          "404": {
+            "description": "Section not found"
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      },
+      "delete": {
+        "operationId": "NavigationController_deleteSection",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Section key: a Mongo ObjectId string or a legacy string key",
+            "schema": {
+              "minLength": 1,
+              "maxLength": 120,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid section key"
+          },
+          "404": {
+            "description": "Section not found"
+          },
+          "409": {
+            "description": "Section contains workshops"
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
     "/navigation/workshops": {
       "get": {
         "operationId": "NavigationController_workshops",
@@ -492,6 +618,41 @@
           "sectionTitle"
         ]
       },
+      "UpdateSectionDto": {
+        "type": "object",
+        "properties": {
+          "sectionTitle": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120,
+            "description": "Display name of the section"
+          },
+          "summary": {
+            "type": "number"
+          },
+          "menuSvgPath": {
+            "type": "string"
+          },
+          "headerSvgPath": {
+            "type": "string"
+          }
+        }
+      },
+      "DeleteResultDto": {
+        "type": "object",
+        "properties": {
+          "acknowledged": {
+            "type": "boolean"
+          },
+          "deletedCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "acknowledged",
+          "deletedCount"
+        ]
+      },
       "Workshop": {
         "type": "object",
         "properties": {}
@@ -599,21 +760,6 @@
             "format": "date-time"
           }
         }
-      },
-      "DeleteResultDto": {
-        "type": "object",
-        "properties": {
-          "acknowledged": {
-            "type": "boolean"
-          },
-          "deletedCount": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "acknowledged",
-          "deletedCount"
-        ]
       },
       "CreateWorkshopPageDto": {
         "type": "object",

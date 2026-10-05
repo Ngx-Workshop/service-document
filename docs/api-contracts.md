@@ -1,6 +1,6 @@
 # Document HTTP contract map
 
-Source review: 2026-10-03. This describes current controllers and caller mappings,
+Source review: 2026-10-05. This describes current controllers and caller mappings,
 not a live integration test. Production adds `/api/documents` to these service
 paths through the gateway; development uses `http://localhost:3007` directly. No global prefix is set in service main.ts.
 
@@ -8,6 +8,9 @@ paths through the gateway; development uses `http://localhost:3007` directly. No
 | --- | --- | --- | --- |
 | POST /navigation/section/create-section | `{ sectionTitle }` (trimmed, 1–120 chars) | SectionDto, HTTP 201 | Admin |
 | GET /navigation/sections | none | `{ sections: Record<string, SectionDto> }` | Public |
+| GET /navigation/section/:id | Section key in path | SectionDto, HTTP 200; 404 if missing | Public |
+| PATCH /navigation/section/:id | UpdateSectionDto: optional sectionTitle, numeric summary, menuSvgPath, headerSvgPath; at least one required | SectionDto, HTTP 200; server timestamp refreshed; 400 for invalid input, 404 if missing | Admin |
+| DELETE /navigation/section/:id | Section key in path | DeleteResultDto, HTTP 200; 404 if missing, 409 if workshops exist | Admin |
 | GET /navigation/workshops | `section` query | WorkshopDto[] ordered by sortId | Public |
 | POST /navigation/workshop/create-workshop | CreateWorkshopDto | WorkshopDto with initial page reference | Admin |
 | POST /navigation/workshop/edit-workshop-name-and-summary | UpdateWorkshopDto, including _id | WorkshopDto; name, summary, thumbnail and slug updated | Admin |
@@ -32,6 +35,13 @@ Nest's default POST status is 201 even where Swagger advertises ApiOkResponse.
 - Section keys come from Section._id stringification. The catalog links use returned
   IDs, preserving legacy angular/nestjs/rxjs keys. New sections get ObjectIds; no
   existing records or workshop sectionId values are migrated.
+- New single-section routes accept nonblank string keys of up to 120 characters,
+  matching legacy string IDs and ObjectIds without changing their representation.
+  Section updates reject nulls and server-owned fields, trim titles (1-120 chars),
+  retain omitted fields and allow empty SVG strings. Empty patches return 400.
+  Deletion never cascades to workshops/pages. Its existence check does not
+  serialize concurrent workshop creation; cross-operation coordination remains
+  a separate integrity requirement.
 - Workshop._id identifies mutations; workshopDocumentGroupId is a name-derived
   slug used by the UI route named :workshopId. Renaming recalculates that slug.
 - Workshop.workshopDocuments contains {_id, name, sortId} references; page records
@@ -52,6 +62,8 @@ Nest's default POST status is 201 even where Swagger advertises ApiOkResponse.
   0.0.1, while deployment derives the patch from GITHUB_RUN_NUMBER. This is not proof
   of the current published version. Generated artifacts were refreshed during section
   creation work and now use current WorkshopPage/DeletePageParams source names.
+  Section CRUD additionally generates and exports UpdateSectionDto and new path
+  operations locally; these artifacts have not been published.
   The editor's section request uses the published SectionDto name field and its
   response uses SectionDto, so this feature needs no frontend package upgrade.
 - POST /api/documents/uploader/image-upload accepts multipart `image` and the editor
@@ -67,6 +79,12 @@ and auth forwarding; the admin shell owns route mounting and identity providers.
 For contract changes: agree on runtime shapes, fix producer metadata, generate and
 build contracts, review compatibility, publish only in an authorized release, then
 update the consumer and verify the full journey. Section creation adds one admin endpoint; deploy it before enabling the editor flow.
+
+Section CRUD adds public GET and Admin PATCH/DELETE /navigation/section/:id while
+preserving existing create/list routes. The editor owner must submit only editable
+fields, merge confirmed update responses, remove only confirmed deleted sections,
+and surface 400/404/409 and persistence failures. Deploy the service first, then
+adopt generated contracts in an authorized release and verify through the gateway.
 
 ## Local authentication mode
 

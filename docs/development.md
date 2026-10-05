@@ -64,7 +64,7 @@ external ngx-net network; it does not supply MongoDB or the auth service.
 | GENERATE_OPENAPI=true npm run openapi | Generate openapi.json from existing dist; build it from current source first |
 | npm run contracts:document:gen | Generate types/models from local openapi.json |
 | npm run contracts:document:build | Compile generated package |
-| npm test -- --runInBand | Jest suite; section creation HTTP/guard/validation checks |
+| npm test -- --runInBand | Jest suite; section CRUD HTTP/guard/validation and local auth checks |
 | npm run test:e2e -- --runInBand | Inherited root-route test; not representative of document API |
 | ./node_modules/.bin/eslint 'src/**/*.ts' 'test/**/*.ts' | Read-only lint check; npm run lint applies fixes |
 | ./node_modules/.bin/tsc --noEmit --incremental false -p tsconfig.build.json | Read-only service typecheck |
@@ -119,3 +119,27 @@ was performed. See [feature handoff](../specs/001-create-sections/handoff.md).
 Earlier migration results above are historical; generated-contract compilation now
 passes, while the direct TypeScript deleteOutDir configuration issue remains separate
 from the successful Nest production build.
+
+## Section CRUD verification — 2026-10-05
+
+- PASS: 71 tests in section-crud.spec.ts, section-creation.spec.ts and
+  document-auth.guard.spec.ts with `npm test -- --runInBand --runTestsByPath
+  src/navigation/section-crud.spec.ts src/navigation/section-creation.spec.ts
+  src/local-development/document-auth.guard.spec.ts`.
+- PASS: `GENERATE_OPENAPI=true npm run build`, contract generation and compilation;
+  generated path/status/parameter/response checks preserve create/list shapes.
+- PASS: focused ESLint for the new CRUD suite, DTOs, schema and controller.
+  Wider changed-file lint finds one inherited no-unnecessary-type-assertion in
+  NavigationService.toWorkshopDto; confirmed unchanged from HEAD and not repaired.
+- PASS: direct service calls against real local MongoDB in a uniquely named
+  `document_section_crud_check_*` database verify create/read/update/delete,
+  ObjectId and legacy string keys, persisted updates, list compatibility, missing
+  records and 409 for nonempty sections. Fixture records were removed and the
+  connection closed; no existing document_local data was changed.
+- NOT RUN: real external auth, gateway or editor UI integration, and concurrent
+  workshop creation/deletion coordination. HTTP tests use real validation/role
+  guards but isolated model and identity doubles; the MongoDB check uses real
+  service/model calls, not HTTP.
+
+See [section CRUD handoff](../specs/003-section-crud/handoff.md). The built-in test
+tool did not discover these Jest files; the repository Jest runner was used.

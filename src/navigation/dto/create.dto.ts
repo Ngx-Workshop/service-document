@@ -7,6 +7,7 @@ import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   MaxLength,
+  Matches,
   IsDateString,
   IsNotEmpty,
   IsNumber,
@@ -48,6 +49,19 @@ export class CreateSectionDto {
   @IsNotEmpty()
   @MaxLength(120)
   sectionTitle: string;
+}
+
+export class SectionParamsDto {
+  @ApiProperty({
+    description: 'Section key: a Mongo ObjectId string or a legacy string key',
+    minLength: 1,
+    maxLength: 120,
+  })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(120)
+  @Matches(/\S/, { message: 'id must not be blank' })
+  id: string;
 }
 
 export class WorkshopDto {

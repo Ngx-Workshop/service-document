@@ -11,6 +11,7 @@ export type { DeleteResultDto } from './models/DeleteResultDto';
 export type { EditPageNameUpdateWorkshopDto } from './models/EditPageNameUpdateWorkshopDto';
 export type { SectionDto } from './models/SectionDto';
 export type { SectionsMapDto } from './models/SectionsMapDto';
+export type { UpdateSectionDto } from './models/UpdateSectionDto';
 export type { UpdateWorkshopDto } from './models/UpdateWorkshopDto';
 export type { Workshop } from './models/Workshop';
 export type { WorkshopDto } from './models/WorkshopDto';

@@ -35,3 +35,14 @@ creation and dynamic ID-based catalog links, resolving the static catalog portio
 of UI-02/API-03. Section-list Swagger shape is corrected and contracts regenerated,
 including the missing-model build repair. Existing workshop slug and unrelated
 validation/CRUD findings remain open. Live integration acceptance is still pending.
+
+## Section CRUD update — 2026-10-05
+
+[003 Section CRUD](../specs/003-section-crud/handoff.md) adds public single-section
+reads and Admin partial updates/deletes, preserving existing create/list routes.
+Mixed schema IDs and lookup filters preserve legacy strings and ObjectIds without
+data migration; both were verified against an isolated local MongoDB database.
+New operation DTOs, failures, roles and generated shapes are covered locally.
+Deletion rejects sections containing workshops; the check is not synchronized
+with concurrent workshop creation. Real gateway/auth/editor acceptance, workshop
+slug behavior and unrelated readiness findings remain open.

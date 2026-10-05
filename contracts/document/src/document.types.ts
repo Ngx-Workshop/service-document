@@ -36,6 +36,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/navigation/section/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["NavigationController_section"];
+        put?: never;
+        post?: never;
+        delete: operations["NavigationController_deleteSection"];
+        options?: never;
+        head?: never;
+        patch: operations["NavigationController_updateSection"];
+        trace?: never;
+    };
     "/navigation/workshops": {
         parameters: {
             query?: never;
@@ -265,6 +281,17 @@ export interface components {
             /** @description Display name of the section */
             sectionTitle: string;
         };
+        UpdateSectionDto: {
+            /** @description Display name of the section */
+            sectionTitle?: string;
+            summary?: number;
+            menuSvgPath?: string;
+            headerSvgPath?: string;
+        };
+        DeleteResultDto: {
+            acknowledged: boolean;
+            deletedCount: number;
+        };
         Workshop: Record<string, never>;
         WorkshopPageIdentifierDto: {
             /** @description Object id of the workshop-page. */
@@ -301,10 +328,6 @@ export interface components {
             workshopDocuments?: components["schemas"]["WorkshopPageIdentifierDto"][];
             /** Format: date-time */
             workshopDocumentsLastUpdated?: string;
-        };
-        DeleteResultDto: {
-            acknowledged: boolean;
-            deletedCount: number;
         };
         CreateWorkshopPageDto: {
             workshopId: string;
@@ -406,6 +429,125 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["SectionDto"];
                 };
+            };
+        };
+    };
+    NavigationController_section: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Section key: a Mongo ObjectId string or a legacy string key */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SectionDto"];
+                };
+            };
+            /** @description Invalid section key */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Section not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NavigationController_deleteSection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Section key: a Mongo ObjectId string or a legacy string key */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteResultDto"];
+                };
+            };
+            /** @description Invalid section key */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Section not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Section contains workshops */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NavigationController_updateSection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Section key: a Mongo ObjectId string or a legacy string key */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSectionDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SectionDto"];
+                };
+            };
+            /** @description Invalid section key or update */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Section not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
