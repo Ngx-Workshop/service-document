@@ -568,6 +568,10 @@
           "sectionTitle": {
             "type": "string"
           },
+          "sectionDescription": {
+            "type": "string",
+            "default": ""
+          },
           "summary": {
             "type": "number"
           },
@@ -584,6 +588,7 @@
         "required": [
           "_id",
           "sectionTitle",
+          "sectionDescription",
           "summary",
           "menuSvgPath",
           "headerSvgPath",
@@ -612,6 +617,10 @@
             "minLength": 1,
             "maxLength": 120,
             "description": "Display name of the section"
+          },
+          "sectionDescription": {
+            "type": "string",
+            "description": "Description of the section; an empty string clears it"
           }
         },
         "required": [
@@ -626,6 +635,10 @@
             "minLength": 1,
             "maxLength": 120,
             "description": "Display name of the section"
+          },
+          "sectionDescription": {
+            "type": "string",
+            "description": "Description of the section; an empty string clears it"
           },
           "summary": {
             "type": "number"

@@ -143,3 +143,22 @@ from the successful Nest production build.
 
 See [section CRUD handoff](../specs/003-section-crud/handoff.md). The built-in test
 tool did not discover these Jest files; the repository Jest runner was used.
+
+## Section description verification - 2026-10-05
+
+- PASS: 87 tests across section-creation.spec.ts, section-crud.spec.ts and
+  document-auth.guard.spec.ts using the focused Jest command above. The VS Code
+  runTests tool discovered no tests, so Jest supplied the actual results.
+- PASS: service build/OpenAPI generation, contract generation/compilation and
+  exact generated description optionality/type/default checks.
+- PASS: focused ESLint on section DTOs, schema and section-crud.spec.ts.
+  Wider changed-source lint retains inherited creation test harness and
+  NavigationService errors, confirmed against HEAD.
+- PASS: direct service calls against isolated local MongoDB verify description
+  create/read/list/update/clear, omission preservation, defaults and legacy string
+  keys without backfilling. Three fixture records were removed. Initial ad hoc
+  probe issues (database name length and Mixed-ID lookup) were corrected.
+- NOT RUN: real gateway/external auth/editor journey, publication or deployment.
+
+See [section description handoff](../specs/004-section-description/handoff.md)
+for exact consumer delivery order and verification limits.

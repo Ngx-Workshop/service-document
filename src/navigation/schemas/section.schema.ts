@@ -14,6 +14,9 @@ export class Section {
   @Prop({ required: true, trim: true, maxlength: 120 })
   sectionTitle: string;
 
+  @Prop({ default: '' })
+  sectionDescription: string;
+
   @Prop({ default: 0 })
   summary: number;
 

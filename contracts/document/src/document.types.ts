@@ -267,6 +267,8 @@ export interface components {
         SectionDto: {
             _id: string;
             sectionTitle: string;
+            /** @default  */
+            sectionDescription: string;
             summary: number;
             menuSvgPath: string;
             headerSvgPath: string;
@@ -280,10 +282,14 @@ export interface components {
         CreateSectionDto: {
             /** @description Display name of the section */
             sectionTitle: string;
+            /** @description Description of the section; an empty string clears it */
+            sectionDescription?: string;
         };
         UpdateSectionDto: {
             /** @description Display name of the section */
             sectionTitle?: string;
+            /** @description Description of the section; an empty string clears it */
+            sectionDescription?: string;
             summary?: number;
             menuSvgPath?: string;
             headerSvgPath?: string;

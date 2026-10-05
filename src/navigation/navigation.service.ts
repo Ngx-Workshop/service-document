@@ -47,6 +47,7 @@ export class NavigationService {
   async createSection(input: CreateSectionDto): Promise<SectionDto> {
     const section = await this.sectionModel.create({
       sectionTitle: input.sectionTitle,
+      sectionDescription: input.sectionDescription,
     });
     return this.toSectionDto(section);
   }
@@ -68,6 +69,7 @@ export class NavigationService {
     const changes = Object.fromEntries(
       Object.entries({
         sectionTitle: input.sectionTitle,
+        sectionDescription: input.sectionDescription,
         summary: input.summary,
         menuSvgPath: input.menuSvgPath,
         headerSvgPath: input.headerSvgPath,
@@ -132,6 +134,7 @@ export class NavigationService {
     return {
       _id: section._id.toString(),
       sectionTitle: section.sectionTitle,
+      sectionDescription: section.sectionDescription ?? '',
       summary: section.summary,
       menuSvgPath: section.menuSvgPath,
       headerSvgPath: section.headerSvgPath,
@@ -146,6 +149,7 @@ export class NavigationService {
         const section: SectionDto = {
           ...cur,
           _id: cur._id.toString(),
+          sectionDescription: cur.sectionDescription ?? '',
         };
         return { ...acc, [section._id]: section };
       },

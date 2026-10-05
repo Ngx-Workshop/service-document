@@ -20,6 +20,7 @@ import * as request from 'supertest';
 import { WorkshopDocumentService } from '../workshop-page/workshop-page.service';
 import { NavigationController } from './navigation.controller';
 import { NavigationService } from './navigation.service';
+import { SectionDto } from './dto/create.dto';
 import { Section, SectionSchema } from './schemas/section.schema';
 import { Workshop } from './schemas/workshop.schema';
 
@@ -116,6 +117,7 @@ describe('Section CRUD HTTP contract', () => {
     const record = new SectionModel({
       _id: id,
       sectionTitle: 'Original',
+      sectionDescription: 'Original description',
       summary: 5,
       menuSvgPath: '/menu.svg',
       headerSvgPath: '/header.svg',
@@ -135,6 +137,7 @@ describe('Section CRUD HTTP contract', () => {
       expect(response.body).toEqual({
         _id: id.toString(),
         sectionTitle: record.sectionTitle,
+        sectionDescription: record.sectionDescription,
         summary: record.summary,
         menuSvgPath: record.menuSvgPath,
         headerSvgPath: record.headerSvgPath,
@@ -142,6 +145,16 @@ describe('Section CRUD HTTP contract', () => {
       });
     }
   );
+
+  it('returns an empty description for a legacy section without the field', async () => {
+    const record = seed('angular');
+    record.set('sectionDescription', undefined);
+    const response = await request(app.getHttpServer())
+      .get('/navigation/section/angular')
+      .expect(200);
+    expect(response.body).toHaveProperty('sectionDescription', '');
+    expect(record.sectionDescription).toBeUndefined();
+  });
 
   it('preserves string and ObjectId alternatives through real Mongoose casting', () => {
     const id = new Types.ObjectId();
@@ -161,6 +174,7 @@ describe('Section CRUD HTTP contract', () => {
         .set('x-test-role', Role.Admin)
         .send({
           sectionTitle: '  Updated  ',
+          sectionDescription: 'Updated description',
           summary: 0,
           menuSvgPath: '',
           headerSvgPath: '/new-header.svg',
@@ -169,6 +183,7 @@ describe('Section CRUD HTTP contract', () => {
       expect(response.body).toMatchObject({
         _id: id.toString(),
         sectionTitle: 'Updated',
+        sectionDescription: 'Updated description',
         summary: 0,
         menuSvgPath: '',
         headerSvgPath: '/new-header.svg',
@@ -189,6 +204,7 @@ describe('Section CRUD HTTP contract', () => {
         expect.objectContaining({
           $set: {
             sectionTitle: 'Updated',
+            sectionDescription: 'Updated description',
             summary: 0,
             menuSvgPath: '',
             headerSvgPath: '/new-header.svg',
@@ -214,6 +230,7 @@ describe('Section CRUD HTTP contract', () => {
         .expect(200);
       expect(response.body).toMatchObject({
         sectionTitle: title,
+        sectionDescription: 'Original description',
         summary: 5,
         menuSvgPath: '/menu.svg',
         headerSvgPath: '/header.svg',
@@ -222,23 +239,36 @@ describe('Section CRUD HTTP contract', () => {
   });
 
   it.each([
+    { sectionDescription: '  Updated\nDescription  ' },
+    { sectionDescription: '' },
     { summary: 2.5 },
     { menuSvgPath: '/new-menu.svg' },
     { headerSvgPath: '' },
   ])('updates an individual optional field: %j', async (body) => {
     seed('angular');
-    const response = await request(app.getHttpServer())
+    const response: { body: SectionDto } = await request(app.getHttpServer())
       .patch('/navigation/section/angular')
       .set('x-test-role', Role.Admin)
       .send(body)
       .expect(200);
     expect(response.body).toMatchObject({
       sectionTitle: 'Original',
+      sectionDescription: 'Original description',
       summary: 5,
       menuSvgPath: '/menu.svg',
       headerSvgPath: '/header.svg',
       ...body,
     });
+    expect(records.get('angular')?.sectionDescription).toBe(
+      body.sectionDescription ?? 'Original description'
+    );
+    expect(Date.parse(response.body.categoriesLastUpdated)).toBeGreaterThan(
+      Date.parse('2020-01-01T00:00:00.000Z')
+    );
+    const read = await request(app.getHttpServer())
+      .get('/navigation/section/angular')
+      .expect(200);
+    expect(read.body).toEqual(response.body);
   });
 
   it.each([
@@ -248,6 +278,11 @@ describe('Section CRUD HTTP contract', () => {
     { sectionTitle: null },
     { sectionTitle: 123 },
     { sectionTitle: 'x'.repeat(121) },
+    { sectionDescription: null },
+    { sectionDescription: 123 },
+    { sectionDescription: false },
+    { sectionDescription: [] },
+    { sectionDescription: {} },
     { summary: null },
     { summary: '2' },
     { summary: {} },

@@ -7,5 +7,9 @@ export type CreateSectionDto = {
      * Display name of the section
      */
     sectionTitle: string;
+    /**
+     * Description of the section; an empty string clears it
+     */
+    sectionDescription?: string;
 };
 

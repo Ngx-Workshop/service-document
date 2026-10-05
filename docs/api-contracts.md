@@ -6,10 +6,10 @@ paths through the gateway; development uses `http://localhost:3007` directly. No
 
 | Method and service path | Request | Actual service return | Declared access |
 | --- | --- | --- | --- |
-| POST /navigation/section/create-section | `{ sectionTitle }` (trimmed, 1–120 chars) | SectionDto, HTTP 201 | Admin |
+| POST /navigation/section/create-section | `{ sectionTitle, sectionDescription? }` (title trimmed, 1–120 chars; description string) | SectionDto, HTTP 201 | Admin |
 | GET /navigation/sections | none | `{ sections: Record<string, SectionDto> }` | Public |
 | GET /navigation/section/:id | Section key in path | SectionDto, HTTP 200; 404 if missing | Public |
-| PATCH /navigation/section/:id | UpdateSectionDto: optional sectionTitle, numeric summary, menuSvgPath, headerSvgPath; at least one required | SectionDto, HTTP 200; server timestamp refreshed; 400 for invalid input, 404 if missing | Admin |
+| PATCH /navigation/section/:id | UpdateSectionDto: optional sectionTitle, sectionDescription, numeric summary, menuSvgPath, headerSvgPath; at least one required | SectionDto, HTTP 200; server timestamp refreshed; 400 for invalid input, 404 if missing | Admin |
 | DELETE /navigation/section/:id | Section key in path | DeleteResultDto, HTTP 200; 404 if missing, 409 if workshops exist | Admin |
 | GET /navigation/workshops | `section` query | WorkshopDto[] ordered by sortId | Public |
 | POST /navigation/workshop/create-workshop | CreateWorkshopDto | WorkshopDto with initial page reference | Admin |
@@ -39,6 +39,11 @@ Nest's default POST status is 201 even where Swagger advertises ApiOkResponse.
   matching legacy string IDs and ObjectIds without changing their representation.
   Section updates reject nulls and server-owned fields, trim titles (1-120 chars),
   retain omitted fields and allow empty SVG strings. Empty patches return 400.
+  sectionDescription is an optional string on create/update and a required string
+  in responses. Creation defaults it to ''; legacy records without it also return
+  ''. Updates preserve it when omitted and accept '' to clear it. Whitespace and
+  multiline descriptions are preserved, with no new length limit. Nulls and
+  non-string descriptions return 400. Numeric summary remains unchanged.
   Deletion never cascades to workshops/pages. Its existence check does not
   serialize concurrent workshop creation; cross-operation coordination remains
   a separate integrity requirement.
@@ -85,6 +90,13 @@ preserving existing create/list routes. The editor owner must submit only editab
 fields, merge confirmed update responses, remove only confirmed deleted sections,
 and surface 400/404/409 and persistence failures. Deploy the service first, then
 adopt generated contracts in an authorized release and verify through the gateway.
+
+Section description adds sectionDescription to create/update requests and every
+section response. Deploy the producer before enabling description writes; older
+title-only requests still work. The editor owner must adopt the generated contracts
+after authorized publication, map description in create/edit/display flows, use
+'' for clearing and verify create/read/list/update through the gateway. No package
+version, publication or deployment is implied by local generation.
 
 ## Local authentication mode
 

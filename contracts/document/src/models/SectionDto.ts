@@ -5,6 +5,7 @@
 export type SectionDto = {
     _id: string;
     sectionTitle: string;
+    sectionDescription: string;
     summary: number;
     menuSvgPath: string;
     headerSvgPath: string;

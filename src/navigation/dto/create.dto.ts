@@ -6,13 +6,14 @@ import {
 import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
-  MaxLength,
-  Matches,
   IsDateString,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
+  Matches,
+  MaxLength,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import { WorkshopPageIdentifierDto } from '../../workshop-page/dto/create.dto';
@@ -22,6 +23,9 @@ export class SectionDto {
 
   @ApiProperty()
   sectionTitle: string;
+
+  @ApiProperty({ default: '' })
+  sectionDescription: string;
 
   @ApiProperty()
   summary: number;
@@ -49,6 +53,13 @@ export class CreateSectionDto {
   @IsNotEmpty()
   @MaxLength(120)
   sectionTitle: string;
+
+  @ApiPropertyOptional({
+    description: 'Description of the section; an empty string clears it',
+  })
+  @ValidateIf((_object, value: unknown) => value !== undefined)
+  @IsString()
+  sectionDescription?: string;
 }
 
 export class SectionParamsDto {

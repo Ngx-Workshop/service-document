@@ -17,6 +17,7 @@ import { model } from 'mongoose';
 import * as request from 'supertest';
 import { NavigationController } from './navigation.controller';
 import { NavigationService } from './navigation.service';
+import { CreateSectionDto, SectionDto, SectionsMapDto } from './dto/create.dto';
 import { Section, SectionSchema } from './schemas/section.schema';
 import { Workshop } from './schemas/workshop.schema';
 import { WorkshopDocumentService } from '../workshop-page/workshop-page.service';
@@ -28,7 +29,7 @@ describe('Section creation HTTP contract', () => {
   const SectionModel = model('SectionCreationTest', SectionSchema);
   const records: Record<string, unknown>[] = [];
   const persistence = {
-    create: jest.fn(async (input: { sectionTitle: string }) => {
+    create: jest.fn(async (input: CreateSectionDto) => {
       const record = new SectionModel(input);
       await record.validate();
       records.push({ ...record.toObject() });
@@ -77,7 +78,7 @@ describe('Section creation HTTP contract', () => {
   });
 
   it('persists a trimmed name with server defaults and exposes it in public reads', async () => {
-    const response = await request(app.getHttpServer())
+    const response: { body: SectionDto } = await request(app.getHttpServer())
       .post('/navigation/section/create-section')
       .set('x-test-role', Role.Admin)
       .send({ sectionTitle: '  TypeScript  ' })
@@ -85,21 +86,45 @@ describe('Section creation HTTP contract', () => {
     expect(response.body).toEqual({
       _id: expect.stringMatching(/^[a-f0-9]{24}$/),
       sectionTitle: 'TypeScript',
+      sectionDescription: '',
       summary: 0,
       menuSvgPath: '',
       headerSvgPath: '',
       categoriesLastUpdated: expect.any(String),
     });
-    const list = await request(app.getHttpServer())
+    const list: { body: SectionsMapDto } = await request(app.getHttpServer())
       .get('/navigation/sections')
       .expect(200);
     expect(list.body.sections[response.body._id].sectionTitle).toBe(
       'TypeScript'
     );
+    expect(list.body.sections[response.body._id].sectionDescription).toBe('');
     expect(persistence.create).toHaveBeenCalledWith({
       sectionTitle: 'TypeScript',
+      sectionDescription: undefined,
     });
   });
+  it.each(['A section description', '', '  First line\nSecond line  '])(
+    'persists and lists the description verbatim: %j',
+    async (sectionDescription) => {
+      const response: { body: SectionDto } = await request(app.getHttpServer())
+        .post('/navigation/section/create-section')
+        .set('x-test-role', Role.Admin)
+        .send({ sectionTitle: 'Test', sectionDescription })
+        .expect(201);
+      expect(response.body.sectionDescription).toBe(sectionDescription);
+      expect(records[0]).toHaveProperty(
+        'sectionDescription',
+        sectionDescription
+      );
+      const list: { body: SectionsMapDto } = await request(app.getHttpServer())
+        .get('/navigation/sections')
+        .expect(200);
+      expect(list.body.sections[response.body._id].sectionDescription).toBe(
+        sectionDescription
+      );
+    }
+  );
   it.each([
     {},
     { sectionTitle: '' },
@@ -109,6 +134,11 @@ describe('Section creation HTTP contract', () => {
     { sectionTitle: 'x'.repeat(121) },
     { sectionTitle: 'Test', _id: 'injected' },
     { sectionTitle: 'Test', summary: 2 },
+    { sectionTitle: 'Test', sectionDescription: null },
+    { sectionTitle: 'Test', sectionDescription: 123 },
+    { sectionTitle: 'Test', sectionDescription: false },
+    { sectionTitle: 'Test', sectionDescription: [] },
+    { sectionTitle: 'Test', sectionDescription: {} },
   ])('rejects invalid requests without persistence: %j', async (body) => {
     await request(app.getHttpServer())
       .post('/navigation/section/create-section')
@@ -148,6 +178,8 @@ describe('Section creation HTTP contract', () => {
       .get('/navigation/sections')
       .expect(200);
     expect(list.body.sections.angular._id).toBe('angular');
+    expect(list.body).toHaveProperty('sections.angular.sectionDescription', '');
+    expect(records[0]).not.toHaveProperty('sectionDescription');
   });
   it('propagates a failed write rather than returning a created section', async () => {
     persistence.create.mockRejectedValueOnce(new Error('Database unavailable'));
