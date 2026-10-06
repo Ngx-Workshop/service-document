@@ -87,3 +87,6 @@ increments the revision. Removal checks entry membership; cascade filters PAGE
 entries only. WorkshopDto/OpenAPI/contracts expose the union on all workshop
 responses. Frontend adoption remains pending; see
 [005 handoff](../specs/005-mixed-workshop-journey/handoff.md).
+
+Existing stored references with no kind default to PAGE on hydration/projection
+(2026-10-06 editor adoption correction); explicit external kinds retain resourceId.

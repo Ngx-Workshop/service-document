@@ -183,3 +183,7 @@ for exact consumer delivery order and verification limits.
 - NOT RUN: gateway/external auth/browser integration, publication or deployment.
 
 See [005 handoff](../specs/005-mixed-workshop-journey/handoff.md).
+
+2026-10-06 editor adoption: 126 Jest tests and focused lint pass after correcting
+untyped existing document references to PAGE; real local MongoDB journey check
+passes. See the 005 handoff correction.

@@ -151,5 +151,6 @@ of the previously empty Workshop schema.
 
 Greenfield breaking changes: required kind, new external resourceId, removal of the
 previously ignored workshopDocuments creation input, generated Workshop model
-replaced by WorkshopDto responses. No migration or fallback for untyped references.
+replaced by WorkshopDto responses. No migration is required. Existing stored untyped document references now default
+to PAGE; new payloads must include kind.
 See [handoff](../specs/005-mixed-workshop-journey/handoff.md) for delivery order.

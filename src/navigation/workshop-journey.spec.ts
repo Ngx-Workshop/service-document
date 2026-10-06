@@ -322,6 +322,24 @@ describe('Mixed workshop journey', () => {
     );
     expect(documents.deleteOne).toHaveBeenCalledWith(pageId);
   });
+  it('defaults untyped existing document references to PAGE, never CODING_LAB', async () => {
+    const record = parent();
+    record.set('workshopDocuments', [
+      { _id: pageId, name: 'Existing page', sortId: 0 },
+    ]);
+    await expect(record.validate()).resolves.toBeUndefined();
+    workshops.find.mockReturnValue({
+      sort: () => ({ exec: () => Promise.resolve([record]) }),
+    });
+    const result = await service.findAllWorkshopsInSection('angular');
+    expect(result[0].workshopDocuments[0]).toEqual({
+      _id: pageId,
+      kind: 'PAGE',
+      name: 'Existing page',
+      sortId: 0,
+    });
+  });
+
   it('schema persists mixed entries and requires external resource IDs', async () => {
     const record = parent();
     await expect(record.validate()).resolves.toBeUndefined();

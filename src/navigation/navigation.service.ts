@@ -312,7 +312,7 @@ export class NavigationService {
     const workshop = await this.workshopModel.findOneAndUpdate(
       {
         _id: workshopIdToUpdate,
-        workshopDocuments: { $elemMatch: { _id, kind: item.kind } },
+        workshopDocuments: { $elemMatch: { _id } },
       },
       {
         $pull: {
@@ -500,7 +500,8 @@ export class NavigationService {
       name: item.name,
       sortId: item.sortId,
     };
-    if (item.kind === 'PAGE') return { ...base, kind: 'PAGE' };
+    if (item.kind === 'PAGE' || item.kind === undefined)
+      return { ...base, kind: 'PAGE' };
     if (item.kind === 'ASSESSMENT_TEST')
       return { ...base, kind: 'ASSESSMENT_TEST', resourceId: item.resourceId };
     return { ...base, kind: 'CODING_LAB', resourceId: item.resourceId };

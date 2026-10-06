@@ -38,6 +38,7 @@ export class Workshop {
           kind: {
             type: String,
             enum: ['PAGE', 'ASSESSMENT_TEST', 'CODING_LAB'],
+            default: 'PAGE',
             required: true,
           },
           name: { type: String, required: true },

@@ -48,4 +48,17 @@ package publication or deployment performed.
 
 Assessment and coding-lab services need no changes for reference persistence. No
 completion/scoring/cross-service existence policy is implemented. Greenfield
-contract exceptions are in spec/plan; consumers cannot use old untyped entries.
+contract exceptions are in spec/plan; new payloads require explicit kind.
+
+## Editor adoption correction — 2026-10-06
+
+Live local editor adoption found existing stored document references without kind.
+The previous projection incorrectly fell through to CODING_LAB. Embedded schema now
+defaults missing kind to PAGE; projection defensively does the same. Entry unlink
+uses immutable placement ID membership, so it also works for these stored references
+without requiring a kind field already persisted. New API payloads still validate
+explicit kinds. No existing records were migrated or altered by this correction.
+
+Verified: 126 Jest tests (39 journey checks), including an untyped-page regression;
+focused source lint and isolated MongoDB journey checks. Local API now exposes
+existing Reactive Streams pages as PAGE. Frontend 014 verifies actual shell rendering.
