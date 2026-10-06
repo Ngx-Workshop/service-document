@@ -46,3 +46,12 @@ New operation DTOs, failures, roles and generated shapes are covered locally.
 Deletion rejects sections containing workshops; the check is not synchronized
 with concurrent workshop creation. Real gateway/auth/editor acceptance, workshop
 slug behavior and unrelated readiness findings remain open.
+
+## Mixed journey update — 2026-10-05
+
+005 adds external references without cross-service coupling. Cascade now extracts
+only PAGE IDs (DATA-03), entry deletion checks membership, and full-permutation
+reorder rejects injection (part of DATA-04/API-02). Parent checks and compensating
+page cleanup address part of DATA-01. Real MongoDB verification is recorded in the
+feature handoff. Multi-document atomicity, navigation/content name synchronization,
+content timestamps, other inline bodies and real auth/gateway/UI remain open.

@@ -105,3 +105,51 @@ DOCUMENT_LOCAL_DEV mode with the exact document_local URI, a loopback connection
 an approved origin supplies local-document-admin. RolesGuard is unchanged. Standalone
 local development needs no live auth service; production and hosted shell auth remain
 normal. See development.md for commands and origin restrictions.
+
+## Mixed workshop journey (005, 2026-10-05)
+
+`WorkshopDto.workshopDocuments` is now an ordered union, discriminated by `kind`:
+
+```ts
+{ _id: string, kind: 'PAGE', name: string, sortId: number }
+{ _id: string, kind: 'ASSESSMENT_TEST', resourceId: string, name: string, sortId: number }
+{ _id: string, kind: 'CODING_LAB', resourceId: string, name: string, sortId: number }
+```
+
+The PAGE `_id` identifies owned document content. External `_id` identifies this
+placement in this workshop; `resourceId` identifies content in its owning service.
+External IDs are opaque nonblank strings; identical resources may be referenced
+multiple times. `name` is a workshop navigation label, not a remote resource rename.
+Array order is canonical; reorder assigns zero-based sortId, while appends choose
+one above the current maximum (removal may leave gaps).
+
+Admin `POST /navigation/page/add-reference` accepts:
+
+```json
+{
+  "workshopId": "<workshop Mongo ID>",
+  "kind": "ASSESSMENT_TEST",
+  "resourceId": "<frontend-selected assessment ID>",
+  "name": "Check your understanding"
+}
+```
+
+Returns 201 WorkshopDto; kind can also be CODING_LAB. Invalid payloads return 400,
+missing workshop 404. No foreign API call, import, remote existence validation or
+cross-service cascade occurs. Frontend is responsible for resolving resources and
+presenting missing/unavailable resources.
+
+Existing create-page emits PAGE entries. Rename and deletion routes operate on
+entry `_id`; external deletion returns `{ acknowledged: true, deletedCount: 1 }`
+for the unlinked placement. PAGE deletion returns the owned content deletion result.
+Sort-pages accepts the full mixed entry array and query workshopId, validates all
+entries, requires each existing ID exactly once and preserves stored metadata.
+Unknown/duplicate/incomplete entries return 400, missing workshop 404, concurrent
+journey mutation during reorder 409. These POST operations retain runtime 201;
+Swagger now describes that status. Public workshop lists use WorkshopDto instead
+of the previously empty Workshop schema.
+
+Greenfield breaking changes: required kind, new external resourceId, removal of the
+previously ignored workshopDocuments creation input, generated Workshop model
+replaced by WorkshopDto responses. No migration or fallback for untyped references.
+See [handoff](../specs/005-mixed-workshop-journey/handoff.md) for delivery order.

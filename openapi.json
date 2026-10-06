@@ -200,7 +200,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Workshop"
+                    "$ref": "#/components/schemas/WorkshopDto"
                   }
                 }
               }
@@ -227,12 +227,12 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Workshop"
+                  "$ref": "#/components/schemas/WorkshopDto"
                 }
               }
             }
@@ -258,12 +258,12 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Workshop"
+                  "$ref": "#/components/schemas/WorkshopDto"
                 }
               }
             }
@@ -279,7 +279,7 @@
         "operationId": "NavigationController_deleteWorkshopAndWorkshops",
         "parameters": [],
         "responses": {
-          "200": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
@@ -313,14 +313,14 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Workshop"
+                    "$ref": "#/components/schemas/WorkshopDto"
                   }
                 }
               }
@@ -347,15 +347,52 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Workshop"
+                  "$ref": "#/components/schemas/WorkshopDto"
                 }
               }
             }
+          }
+        },
+        "tags": [
+          "Navigation"
+        ]
+      }
+    },
+    "/navigation/page/add-reference": {
+      "post": {
+        "operationId": "NavigationController_addReference",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddWorkshopReferenceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkshopDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid reference"
+          },
+          "404": {
+            "description": "Workshop not found"
           }
         },
         "tags": [
@@ -378,7 +415,7 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
@@ -409,7 +446,7 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
@@ -445,14 +482,32 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WorkshopPageIdentifierDto"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AssessmentTestIdentifierDto"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CodingLabIdentifierDto"
+                    }
+                  ],
+                  "discriminator": {
+                    "propertyName": "kind",
+                    "mapping": {
+                      "PAGE": "#/components/schemas/WorkshopPageIdentifierDto",
+                      "ASSESSMENT_TEST": "#/components/schemas/AssessmentTestIdentifierDto",
+                      "CODING_LAB": "#/components/schemas/CodingLabIdentifierDto"
+                    }
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
@@ -461,6 +516,15 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Invalid journey permutation"
+          },
+          "404": {
+            "description": "Workshop not found"
+          },
+          "409": {
+            "description": "Journey changed during reorder"
           }
         },
         "tags": [
@@ -595,6 +659,103 @@
           "categoriesLastUpdated"
         ]
       },
+      "WorkshopPageIdentifierDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Workshop entry ID; for PAGE entries this is the document page ID."
+          },
+          "name": {
+            "type": "string",
+            "description": "Workshop navigation label."
+          },
+          "sortId": {
+            "type": "number",
+            "description": "Position of the entry in the workshop journey"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "PAGE"
+            ]
+          }
+        },
+        "required": [
+          "_id",
+          "name",
+          "sortId",
+          "kind"
+        ]
+      },
+      "AssessmentTestIdentifierDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Workshop entry ID; for PAGE entries this is the document page ID."
+          },
+          "name": {
+            "type": "string",
+            "description": "Workshop navigation label."
+          },
+          "sortId": {
+            "type": "number",
+            "description": "Position of the entry in the workshop journey"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "ASSESSMENT_TEST"
+            ]
+          },
+          "resourceId": {
+            "type": "string",
+            "description": "Opaque assessment-test ID supplied by the frontend"
+          }
+        },
+        "required": [
+          "_id",
+          "name",
+          "sortId",
+          "kind",
+          "resourceId"
+        ]
+      },
+      "CodingLabIdentifierDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Workshop entry ID; for PAGE entries this is the document page ID."
+          },
+          "name": {
+            "type": "string",
+            "description": "Workshop navigation label."
+          },
+          "sortId": {
+            "type": "number",
+            "description": "Position of the entry in the workshop journey"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "CODING_LAB"
+            ]
+          },
+          "resourceId": {
+            "type": "string",
+            "description": "Opaque coding-lab ID supplied by the frontend"
+          }
+        },
+        "required": [
+          "_id",
+          "name",
+          "sortId",
+          "kind",
+          "resourceId"
+        ]
+      },
       "SectionsMapDto": {
         "type": "object",
         "properties": {
@@ -666,30 +827,71 @@
           "deletedCount"
         ]
       },
-      "Workshop": {
-        "type": "object",
-        "properties": {}
-      },
-      "WorkshopPageIdentifierDto": {
+      "WorkshopDto": {
         "type": "object",
         "properties": {
           "_id": {
-            "type": "string",
-            "description": "Object id of the workshop-page."
+            "type": "string"
           },
-          "name": {
-            "type": "string",
-            "description": "Display name of the workshop-page."
+          "workshopDocumentGroupId": {
+            "type": "string"
+          },
+          "sectionId": {
+            "type": "string"
           },
           "sortId": {
             "type": "number",
-            "description": "Position of the doc item in the section's list"
+            "default": 0
+          },
+          "name": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "thumbnail": {
+            "type": "string",
+            "default": "https://via.placeholder.com/250/400"
+          },
+          "workshopDocuments": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/WorkshopPageIdentifierDto"
+                },
+                {
+                  "$ref": "#/components/schemas/AssessmentTestIdentifierDto"
+                },
+                {
+                  "$ref": "#/components/schemas/CodingLabIdentifierDto"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "kind",
+                "mapping": {
+                  "PAGE": "#/components/schemas/WorkshopPageIdentifierDto",
+                  "ASSESSMENT_TEST": "#/components/schemas/AssessmentTestIdentifierDto",
+                  "CODING_LAB": "#/components/schemas/CodingLabIdentifierDto"
+                }
+              }
+            }
+          },
+          "workshopDocumentsLastUpdated": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "required": [
           "_id",
+          "workshopDocumentGroupId",
+          "sectionId",
+          "sortId",
           "name",
-          "sortId"
+          "summary",
+          "thumbnail",
+          "workshopDocuments",
+          "workshopDocumentsLastUpdated"
         ]
       },
       "CreateWorkshopDto": {
@@ -717,12 +919,6 @@
           "thumbnail": {
             "type": "string",
             "default": "https://via.placeholder.com/250/400"
-          },
-          "workshopDocuments": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/WorkshopPageIdentifierDto"
-            }
           },
           "workshopDocumentsLastUpdated": {
             "type": "string",
@@ -762,12 +958,6 @@
             "type": "string",
             "default": "https://via.placeholder.com/250/400"
           },
-          "workshopDocuments": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/WorkshopPageIdentifierDto"
-            }
-          },
           "workshopDocumentsLastUpdated": {
             "type": "string",
             "format": "date-time"
@@ -803,6 +993,34 @@
         },
         "required": [
           "workshopId"
+        ]
+      },
+      "AddWorkshopReferenceDto": {
+        "type": "object",
+        "properties": {
+          "workshopId": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "ASSESSMENT_TEST",
+              "CODING_LAB"
+            ]
+          },
+          "resourceId": {
+            "type": "string",
+            "description": "Opaque resource ID; no remote existence check is performed"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "workshopId",
+          "kind",
+          "resourceId",
+          "name"
         ]
       },
       "DeletePageParamsDto": {
@@ -841,55 +1059,6 @@
           "_id",
           "name",
           "workshopId"
-        ]
-      },
-      "WorkshopDto": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "string"
-          },
-          "workshopDocumentGroupId": {
-            "type": "string"
-          },
-          "sectionId": {
-            "type": "string"
-          },
-          "sortId": {
-            "type": "number",
-            "default": 0
-          },
-          "name": {
-            "type": "string"
-          },
-          "summary": {
-            "type": "string"
-          },
-          "thumbnail": {
-            "type": "string",
-            "default": "https://via.placeholder.com/250/400"
-          },
-          "workshopDocuments": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/WorkshopPageIdentifierDto"
-            }
-          },
-          "workshopDocumentsLastUpdated": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "_id",
-          "workshopDocumentGroupId",
-          "sectionId",
-          "sortId",
-          "name",
-          "summary",
-          "thumbnail",
-          "workshopDocuments",
-          "workshopDocumentsLastUpdated"
         ]
       },
       "WorkshopPageDto": {

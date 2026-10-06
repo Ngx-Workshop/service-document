@@ -1,6 +1,6 @@
 # Document service architecture
 
-Source baseline: ec50bd0 · Section CRUD updated 2026-10-05.
+Source baseline: ec50bd0 · Mixed workshop journey updated 2026-10-05.
 
 ## Responsibility and stack
 
@@ -41,14 +41,14 @@ Admin DELETE removes an empty section,
 returning DeleteResultDto; nonempty sections return 409 and missing sections 404.
 The workshop existence check and deletion are separate operations: concurrent
 workshop creation is not coordinated and may race deletion. No cascade occurs.
-Workshop stores sectionId, slug, metadata, sortId, embedded workshopDocuments and
+Workshop stores sectionId, slug, metadata, sortId, embedded mixed-kind workshopDocuments and
 workshopDocumentsLastUpdated. A pre-save hook creates the name-derived slug; rename
 sets it explicitly. No uniqueness declaration protects this slug.
 WorkshopPage stores parent workshopGroupId, name, sortId, pageType, lastUpdated and
 html. Defaults create a Page with one header block stored as JSON text.
 
 Creating a workshop creates its first page and then writes the reference. Creating
-another page creates a record before updating the parent. These are separate writes
+another page checks the parent, creates a record and compensates failed linking. These are separate writes
 without a transaction. Page rename and reorder update only embedded references;
 content save updates only html, without refreshing lastUpdated. Deletion updates
 parent references and page records separately. The readiness review records the
@@ -75,3 +75,15 @@ mode to serve traffic or as evidence of real authorization/persistence.
 Deployment generates OpenAPI, generates/builds/publishes contracts with a CI run
 number patch version, then deploys the container. Its startup check is a TCP probe,
 not a complete document or authorization check. No release was run in this migration.
+
+## Mixed workshop journey
+
+workshopDocuments is an explicit embedded PAGE/ASSESSMENT_TEST/CODING_LAB union.
+External resources use an entry ID distinct from their opaque resourceId; the service
+never imports foreign DTOs, fetches resources or deletes remote content. Admin
+add-reference atomically appends; mixed reorder validates a full permutation and
+uses __v compare-and-set to prevent concurrent lost updates. Every journey mutation
+increments the revision. Removal checks entry membership; cascade filters PAGE
+entries only. WorkshopDto/OpenAPI/contracts expose the union on all workshop
+responses. Frontend adoption remains pending; see
+[005 handoff](../specs/005-mixed-workshop-journey/handoff.md).

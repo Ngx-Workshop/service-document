@@ -148,6 +148,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/navigation/page/add-reference": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["NavigationController_addReference"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/navigation/page/delete-page-and-update-workshop": {
         parameters: {
             query?: never;
@@ -274,6 +290,49 @@ export interface components {
             headerSvgPath: string;
             categoriesLastUpdated: string;
         };
+        WorkshopPageIdentifierDto: {
+            /** @description Workshop entry ID; for PAGE entries this is the document page ID. */
+            _id: string;
+            /** @description Workshop navigation label. */
+            name: string;
+            /** @description Position of the entry in the workshop journey */
+            sortId: number;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "PAGE";
+        };
+        AssessmentTestIdentifierDto: {
+            /** @description Workshop entry ID; for PAGE entries this is the document page ID. */
+            _id: string;
+            /** @description Workshop navigation label. */
+            name: string;
+            /** @description Position of the entry in the workshop journey */
+            sortId: number;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "ASSESSMENT_TEST";
+            /** @description Opaque assessment-test ID supplied by the frontend */
+            resourceId: string;
+        };
+        CodingLabIdentifierDto: {
+            /** @description Workshop entry ID; for PAGE entries this is the document page ID. */
+            _id: string;
+            /** @description Workshop navigation label. */
+            name: string;
+            /** @description Position of the entry in the workshop journey */
+            sortId: number;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "CODING_LAB";
+            /** @description Opaque coding-lab ID supplied by the frontend */
+            resourceId: string;
+        };
         SectionsMapDto: {
             sections: {
                 [key: string]: components["schemas"]["SectionDto"];
@@ -298,14 +357,19 @@ export interface components {
             acknowledged: boolean;
             deletedCount: number;
         };
-        Workshop: Record<string, never>;
-        WorkshopPageIdentifierDto: {
-            /** @description Object id of the workshop-page. */
+        WorkshopDto: {
             _id: string;
-            /** @description Display name of the workshop-page. */
-            name: string;
-            /** @description Position of the doc item in the section's list */
+            workshopDocumentGroupId: string;
+            sectionId: string;
+            /** @default 0 */
             sortId: number;
+            name: string;
+            summary: string;
+            /** @default https://via.placeholder.com/250/400 */
+            thumbnail: string;
+            workshopDocuments: (components["schemas"]["WorkshopPageIdentifierDto"] | components["schemas"]["AssessmentTestIdentifierDto"] | components["schemas"]["CodingLabIdentifierDto"])[];
+            /** Format: date-time */
+            workshopDocumentsLastUpdated: string;
         };
         CreateWorkshopDto: {
             _id: string;
@@ -317,7 +381,6 @@ export interface components {
             summary: string;
             /** @default https://via.placeholder.com/250/400 */
             thumbnail: string;
-            workshopDocuments?: components["schemas"]["WorkshopPageIdentifierDto"][];
             /** Format: date-time */
             workshopDocumentsLastUpdated?: string;
         };
@@ -331,7 +394,6 @@ export interface components {
             summary?: string;
             /** @default https://via.placeholder.com/250/400 */
             thumbnail: string;
-            workshopDocuments?: components["schemas"]["WorkshopPageIdentifierDto"][];
             /** Format: date-time */
             workshopDocumentsLastUpdated?: string;
         };
@@ -348,6 +410,14 @@ export interface components {
             /** @description Serialized JSON of the document blocks */
             html?: string;
         };
+        AddWorkshopReferenceDto: {
+            workshopId: string;
+            /** @enum {string} */
+            kind: "ASSESSMENT_TEST" | "CODING_LAB";
+            /** @description Opaque resource ID; no remote existence check is performed */
+            resourceId: string;
+            name: string;
+        };
         DeletePageParamsDto: {
             _id: string;
             workshopId: string;
@@ -357,20 +427,6 @@ export interface components {
             _id: string;
             name: string;
             workshopId: string;
-        };
-        WorkshopDto: {
-            _id: string;
-            workshopDocumentGroupId: string;
-            sectionId: string;
-            /** @default 0 */
-            sortId: number;
-            name: string;
-            summary: string;
-            /** @default https://via.placeholder.com/250/400 */
-            thumbnail: string;
-            workshopDocuments: components["schemas"]["WorkshopPageIdentifierDto"][];
-            /** Format: date-time */
-            workshopDocumentsLastUpdated: string;
         };
         WorkshopPageDto: {
             _id: string;
@@ -573,7 +629,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Workshop"][];
+                    "application/json": components["schemas"]["WorkshopDto"][];
                 };
             };
         };
@@ -591,12 +647,12 @@ export interface operations {
             };
         };
         responses: {
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Workshop"];
+                    "application/json": components["schemas"]["WorkshopDto"];
                 };
             };
         };
@@ -614,12 +670,12 @@ export interface operations {
             };
         };
         responses: {
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Workshop"];
+                    "application/json": components["schemas"]["WorkshopDto"];
                 };
             };
         };
@@ -633,7 +689,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -656,12 +712,12 @@ export interface operations {
             };
         };
         responses: {
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Workshop"][];
+                    "application/json": components["schemas"]["WorkshopDto"][];
                 };
             };
         };
@@ -679,13 +735,50 @@ export interface operations {
             };
         };
         responses: {
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Workshop"];
+                    "application/json": components["schemas"]["WorkshopDto"];
                 };
+            };
+        };
+    };
+    NavigationController_addReference: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddWorkshopReferenceDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkshopDto"];
+                };
+            };
+            /** @description Invalid reference */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Workshop not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -702,7 +795,7 @@ export interface operations {
             };
         };
         responses: {
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -725,7 +818,7 @@ export interface operations {
             };
         };
         responses: {
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -746,17 +839,38 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": string[];
+                "application/json": (components["schemas"]["WorkshopPageIdentifierDto"] | components["schemas"]["AssessmentTestIdentifierDto"] | components["schemas"]["CodingLabIdentifierDto"])[];
             };
         };
         responses: {
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": components["schemas"]["WorkshopDto"];
                 };
+            };
+            /** @description Invalid journey permutation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Workshop not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey changed during reorder */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

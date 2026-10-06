@@ -162,3 +162,24 @@ tool did not discover these Jest files; the repository Jest runner was used.
 
 See [section description handoff](../specs/004-section-description/handoff.md)
 for exact consumer delivery order and verification limits.
+
+## Mixed workshop journey verification — 2026-10-05
+
+- PASS: 125 tests in four Jest suites, including 38 new mixed-journey HTTP/service/
+  schema checks. Identity and persistence in HTTP tests use isolated doubles.
+- PASS: `npm run test:journey:mongo` against local MongoDB. Uses a unique
+  `document_journey_check_*` database and drops only that database in finally.
+  Verifies mixed round-trip, eight concurrent appends with distinct IDs/positions,
+  repeated and dollar-prefixed resource IDs, reorder and revision conflict, rename,
+  external unlink, subsequent document append and owned-page cascade.
+- PASS: service build/OpenAPI generation, contract generation/build, discriminator
+  mapping and union request/response assertions, focused ESLint on changed DTOs,
+  controller, service, workshop schema and new Jest suite.
+- Corrected during verification: exact embedded-document compare-and-set produced
+  a false conflict due to BSON field order; revision compare-and-set passed MongoDB.
+  Concurrent append test initially assumed arrival order; it now checks stored IDs.
+- Generated codegen WorkshopDto has an extra terminal blank line reported by
+  `git diff --check`; generated models were not hand-edited.
+- NOT RUN: gateway/external auth/browser integration, publication or deployment.
+
+See [005 handoff](../specs/005-mixed-workshop-journey/handoff.md).

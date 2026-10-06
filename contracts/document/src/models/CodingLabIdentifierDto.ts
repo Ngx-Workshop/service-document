@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type WorkshopPageIdentifierDto = {
+export type CodingLabIdentifierDto = {
     /**
      * Workshop entry ID; for PAGE entries this is the document page ID.
      */
@@ -15,6 +15,10 @@ export type WorkshopPageIdentifierDto = {
      * Position of the entry in the workshop journey
      */
     sortId: number;
-    kind: 'PAGE';
+    kind: 'CODING_LAB';
+    /**
+     * Opaque coding-lab ID supplied by the frontend
+     */
+    resourceId: string;
 };
 

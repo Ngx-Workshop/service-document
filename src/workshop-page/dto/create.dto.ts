@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsDateString,
+  IsIn,
   IsMongoId,
   IsNotEmpty,
   IsNumber,
@@ -69,23 +70,32 @@ export class CreateWorkshopPageDto {
   html?: string;
 }
 
-export class WorkshopPageIdentifierDto {
-  @ApiProperty({ description: 'Object id of the workshop-page.' })
+export class WorkshopJourneyIdentifierDto {
+  @ApiProperty({
+    description:
+      'Workshop entry ID; for PAGE entries this is the document page ID.',
+  })
   @IsString()
   @IsNotEmpty()
   _id: string;
 
-  @ApiProperty({ description: 'Display name of the workshop-page.' })
+  @ApiProperty({ description: 'Workshop navigation label.' })
   @IsString()
   @IsNotEmpty()
   name: string;
 
   @ApiProperty({
-    description: "Position of the doc item in the section's list",
+    description: 'Position of the entry in the workshop journey',
   })
   @Type(() => Number)
   @IsNumber()
   sortId: number;
+}
+
+export class WorkshopPageIdentifierDto extends WorkshopJourneyIdentifierDto {
+  @ApiProperty({ enum: ['PAGE'] })
+  @IsIn(['PAGE'])
+  kind: 'PAGE';
 }
 
 export class EditPageNameUpdateWorkshopDto {

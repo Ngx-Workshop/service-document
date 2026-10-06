@@ -72,7 +72,7 @@ export class WorkshopDocumentService {
     workshopDocuments: WorkshopPage[] | WorkshopPageIdentifierDto[]
   ) {
     return await this.workshopDocumentModel.deleteMany({
-      _id: workshopDocuments,
+      _id: { $in: workshopDocuments.map((document) => document._id) },
     });
   }
 

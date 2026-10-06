@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { WorkshopPageIdentifierDto } from 'src/workshop-page/dto/create.dto';
+import { WorkshopJourneyItem } from '../dto/journey.dto';
+import { Schema as MongoSchema } from 'mongoose';
 
 export type TWorkshopDocument = HydratedDocument<Workshop>;
 
@@ -29,8 +30,31 @@ export class Workshop {
   })
   thumbnail: string;
 
-  @Prop()
-  workshopDocuments: WorkshopPageIdentifierDto[];
+  @Prop({
+    type: [
+      new MongoSchema(
+        {
+          _id: { type: String, required: true },
+          kind: {
+            type: String,
+            enum: ['PAGE', 'ASSESSMENT_TEST', 'CODING_LAB'],
+            required: true,
+          },
+          name: { type: String, required: true },
+          sortId: { type: Number, required: true },
+          resourceId: {
+            type: String,
+            required: function (this: { kind: string }) {
+              return this.kind !== 'PAGE';
+            },
+          },
+        },
+        { _id: false }
+      ),
+    ],
+    default: [],
+  })
+  workshopDocuments: WorkshopJourneyItem[];
 
   @Prop()
   workshopDocumentsLastUpdated: Date;
@@ -38,7 +62,7 @@ export class Workshop {
 
 export const WorkshopSchema = SchemaFactory.createForClass(Workshop);
 
-WorkshopSchema.pre('save', async function () {
+WorkshopSchema.pre('save', function () {
   if (this.isNew) {
     this.workshopDocumentGroupId = toSpinalCase(this.name);
   }

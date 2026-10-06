@@ -23,7 +23,8 @@
     "contracts:document:gen": "npm --prefix ./contracts/document run gen",
     "contracts:document:build": "npm --prefix ./contracts/document run build",
     "contracts:document:publish": "npm --prefix ./contracts/document publish --access public",
-    "start:local": "DOCUMENT_LOCAL_DEV=true NODE_ENV=development GENERATE_OPENAPI=false MONGODB_URI=mongodb://127.0.0.1:27017/document_local PORT=3007 nest start --watch"
+    "start:local": "DOCUMENT_LOCAL_DEV=true NODE_ENV=development GENERATE_OPENAPI=false MONGODB_URI=mongodb://127.0.0.1:27017/document_local PORT=3007 nest start --watch",
+    "test:journey:mongo": "node -r ts-node/register/transpile-only -r tsconfig-paths/register test/workshop-journey.mongo.cjs"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",

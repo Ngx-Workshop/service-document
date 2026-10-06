@@ -3,6 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export type { AddWorkshopReferenceDto } from './models/AddWorkshopReferenceDto';
+export type { AssessmentTestIdentifierDto } from './models/AssessmentTestIdentifierDto';
+export type { CodingLabIdentifierDto } from './models/CodingLabIdentifierDto';
 export type { CreateSectionDto } from './models/CreateSectionDto';
 export type { CreateWorkshopDto } from './models/CreateWorkshopDto';
 export type { CreateWorkshopPageDto } from './models/CreateWorkshopPageDto';
@@ -13,7 +16,6 @@ export type { SectionDto } from './models/SectionDto';
 export type { SectionsMapDto } from './models/SectionsMapDto';
 export type { UpdateSectionDto } from './models/UpdateSectionDto';
 export type { UpdateWorkshopDto } from './models/UpdateWorkshopDto';
-export type { Workshop } from './models/Workshop';
 export type { WorkshopDto } from './models/WorkshopDto';
 export type { WorkshopPageDto } from './models/WorkshopPageDto';
 export type { WorkshopPageIdentifierDto } from './models/WorkshopPageIdentifierDto';

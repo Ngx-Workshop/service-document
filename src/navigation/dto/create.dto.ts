@@ -5,8 +5,8 @@ import {
 } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
-  IsArray,
   IsDateString,
+  IsMongoId,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -14,9 +14,8 @@ import {
   Matches,
   MaxLength,
   ValidateIf,
-  ValidateNested,
 } from 'class-validator';
-import { WorkshopPageIdentifierDto } from '../../workshop-page/dto/create.dto';
+import { journeyItemSchema, WorkshopJourneyItem } from './journey.dto';
 
 export class SectionDto {
   @ApiProperty() _id: string;
@@ -96,8 +95,8 @@ export class WorkshopDto {
   @ApiProperty({ default: 'https://via.placeholder.com/250/400' })
   thumbnail: string;
 
-  @ApiProperty({ type: () => [WorkshopPageIdentifierDto] })
-  workshopDocuments: WorkshopPageIdentifierDto[];
+  @ApiProperty({ type: 'array', items: journeyItemSchema })
+  workshopDocuments: WorkshopJourneyItem[];
 
   @ApiProperty({ type: String, format: 'date-time' })
   workshopDocumentsLastUpdated: Date;
@@ -139,13 +138,6 @@ export class CreateWorkshopDto {
   @IsOptional()
   thumbnail?: string;
 
-  @ApiPropertyOptional({ type: () => [WorkshopPageIdentifierDto] })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => WorkshopPageIdentifierDto)
-  @IsOptional()
-  workshopDocuments?: WorkshopPageIdentifierDto[];
-
   @ApiPropertyOptional({ type: String, format: 'date-time' })
   @IsDateString()
   @IsOptional()
@@ -154,13 +146,11 @@ export class CreateWorkshopDto {
 
 export class DeletePageParamsDto {
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
+  @IsMongoId()
   _id: string;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
+  @IsMongoId()
   workshopId: string;
 
   @ApiProperty()
