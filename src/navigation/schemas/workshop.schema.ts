@@ -21,6 +21,9 @@ export class Workshop {
   @Prop({ required: true })
   name: string;
 
+  @Prop({ required: true, default: 1, min: 1, max: 20 })
+  level: number;
+
   @Prop({ required: true })
   summary: string;
 

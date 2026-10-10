@@ -7,6 +7,9 @@ import { Transform, Type } from 'class-transformer';
 import {
   IsDateString,
   IsMongoId,
+  IsInt,
+  Min,
+  Max,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -99,6 +102,9 @@ export class WorkshopDto {
   @ApiProperty()
   name: string;
 
+  @ApiProperty({ default: 1, minimum: 1, maximum: 20, type: 'integer' })
+  level: number;
+
   @ApiProperty()
   summary: string;
 
@@ -142,6 +148,13 @@ export class CreateWorkshopDto {
   @IsString()
   @IsNotEmpty()
   summary: string;
+
+  @ApiPropertyOptional({ default: 1, minimum: 1, maximum: 20, type: 'integer' })
+  @ValidateIf((_object, value: unknown) => value !== undefined)
+  @IsInt()
+  @Min(1)
+  @Max(20)
+  level?: number;
 
   @ApiPropertyOptional({ default: 'https://via.placeholder.com/250/400' })
   @IsString()

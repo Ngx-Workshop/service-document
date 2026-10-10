@@ -366,6 +366,8 @@ export interface components {
             /** @default 0 */
             sortId: number;
             name: string;
+            /** @default 1 */
+            level: number;
             summary: string;
             /** @default https://via.placeholder.com/250/400 */
             thumbnail: string;
@@ -381,6 +383,8 @@ export interface components {
             sortId: number;
             name: string;
             summary: string;
+            /** @default 1 */
+            level: number;
             /** @default https://via.placeholder.com/250/400 */
             thumbnail: string;
             /** Format: date-time */
@@ -394,6 +398,8 @@ export interface components {
             sortId: number;
             name?: string;
             summary?: string;
+            /** @default 1 */
+            level: number;
             /** @default https://via.placeholder.com/250/400 */
             thumbnail: string;
             /** Format: date-time */

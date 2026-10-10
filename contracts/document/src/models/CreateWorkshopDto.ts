@@ -9,6 +9,7 @@ export type CreateWorkshopDto = {
     sortId?: number;
     name: string;
     summary: string;
+    level?: number;
     thumbnail?: string;
     workshopDocumentsLastUpdated?: string;
 };

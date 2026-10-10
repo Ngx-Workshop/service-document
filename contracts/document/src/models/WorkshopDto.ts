@@ -11,6 +11,7 @@ export type WorkshopDto = {
     sectionId: string;
     sortId: number;
     name: string;
+    level: number;
     summary: string;
     thumbnail: string;
     workshopDocuments: Array<(WorkshopPageIdentifierDto | AssessmentTestIdentifierDto | CodingLabIdentifierDto)>;

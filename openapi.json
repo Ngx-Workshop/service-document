@@ -852,6 +852,12 @@
           "name": {
             "type": "string"
           },
+          "level": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1,
+            "maximum": 20
+          },
           "summary": {
             "type": "string"
           },
@@ -894,6 +900,7 @@
           "sectionId",
           "sortId",
           "name",
+          "level",
           "summary",
           "thumbnail",
           "workshopDocuments",
@@ -921,6 +928,12 @@
           },
           "summary": {
             "type": "string"
+          },
+          "level": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1,
+            "maximum": 20
           },
           "thumbnail": {
             "type": "string",
@@ -959,6 +972,12 @@
           },
           "summary": {
             "type": "string"
+          },
+          "level": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1,
+            "maximum": 20
           },
           "thumbnail": {
             "type": "string",

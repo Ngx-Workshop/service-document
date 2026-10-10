@@ -91,3 +91,10 @@ responses. Frontend adoption remains pending; see
 
 Existing stored references with no kind default to PAGE on hydration/projection
 (2026-10-06 editor adoption correction); explicit external kinds retain resourceId.
+
+## Workshop level — 2026-10-10
+
+Workshop metadata includes level (default 1, range 1–20). The service validates
+integer payloads, preserves omitted edit values and returns 1 for legacy records.
+The administrator form requires level on create/edit and loads saved values.
+See [007 handoff](../specs/007-workshop-level/handoff.md) for contract delivery order.

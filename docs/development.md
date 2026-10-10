@@ -199,3 +199,9 @@ passes. See the 005 handoff correction.
 - NOT RUN: live MongoDB, hosted editor/gateway/auth, publication or deployment.
 
 See [006 handoff](../specs/006-section-creation-artwork/handoff.md).
+
+## Workshop level verification — 2026-10-10
+
+153 service tests and 28 focused ChromeHeadless workshop-authoring tests passed. Service production build, OpenAPI regeneration, generated contract compilation and editor production build passed. Whitespace checks passed.
+No live MongoDB/gateway/hosted UI checks, publication or deployment.
+See [handoff](../specs/007-workshop-level/handoff.md).

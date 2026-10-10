@@ -224,11 +224,12 @@ export class NavigationService {
         name: workshop.name ?? existingWorkshop.name,
         summary: workshop.summary ?? existingWorkshop.summary,
         thumbnail: workshop.thumbnail ?? existingWorkshop.thumbnail,
+        level: workshop.level ?? existingWorkshop.level ?? 1,
         workshopDocumentGroupId: toSpinalCase(
           workshop.name ?? existingWorkshop.name
         ),
       },
-      { returnDocument: 'after' }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!updatedWorkshop) {
@@ -488,6 +489,7 @@ export class NavigationService {
       sortId: workshop.sortId,
       name: workshop.name,
       summary: workshop.summary,
+      level: workshop.level ?? 1,
       thumbnail: workshop.thumbnail,
       workshopDocuments:
         workshop.workshopDocuments?.map((doc) => this.toJourneyItem(doc)) ?? [],
