@@ -59,6 +59,16 @@ export class CreateSectionDto {
   @ValidateIf((_object, value: unknown) => value !== undefined)
   @IsString()
   sectionDescription?: string;
+
+  @ApiPropertyOptional()
+  @ValidateIf((_object, value: unknown) => value !== undefined)
+  @IsString()
+  menuSvgPath?: string;
+
+  @ApiPropertyOptional()
+  @ValidateIf((_object, value: unknown) => value !== undefined)
+  @IsString()
+  headerSvgPath?: string;
 }
 
 export class SectionParamsDto {

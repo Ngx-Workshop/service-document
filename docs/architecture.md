@@ -31,8 +31,9 @@ empty string and is returned as an empty string for legacy records without it.
 Its mixed _id schema accepts legacy string keys and defaults new values to
 ObjectIds; existing keys are unchanged.
 Admin POST /navigation/section/create-section accepts a trimmed sectionTitle (1–120
-characters) and optional sectionDescription, with numeric summary 0, empty artwork
-paths and a server timestamp.
+characters) and optional sectionDescription, menuSvgPath and headerSvgPath strings.
+Omitted description/artwork fields default to empty strings; supplied artwork paths
+are persisted, with numeric summary 0 and a server timestamp.
 Public GET /navigation/section/:id returns one SectionDto. Admin PATCH on the
 same path accepts title, description, numeric summary and both SVG paths, preserving
 omitted fields and setting a server timestamp. Description accepts empty strings

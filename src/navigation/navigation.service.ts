@@ -56,6 +56,8 @@ export class NavigationService {
     const section = await this.sectionModel.create({
       sectionTitle: input.sectionTitle,
       sectionDescription: input.sectionDescription,
+      menuSvgPath: input.menuSvgPath,
+      headerSvgPath: input.headerSvgPath,
     });
     return this.toSectionDto(section);
   }

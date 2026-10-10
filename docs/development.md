@@ -187,3 +187,15 @@ See [005 handoff](../specs/005-mixed-workshop-journey/handoff.md).
 2026-10-06 editor adoption: 126 Jest tests and focused lint pass after correcting
 untyped existing document references to PAGE; real local MongoDB journey check
 passes. See the 005 handoff correction.
+
+## Section creation artwork verification — 2026-10-09
+
+- PASS: 101 tests across section-creation.spec.ts, section-crud.spec.ts and
+  document-auth.guard.spec.ts. Includes the exact Rust payload, omitted/empty/
+  populated path persistence/listing, invalid types and update/auth regressions.
+  HTTP tests use real validation/roles/schema with isolated model/identity doubles.
+- PASS: service build/OpenAPI generation, contract generation/build, DTO lint and
+  generated optional string schema checks.
+- NOT RUN: live MongoDB, hosted editor/gateway/auth, publication or deployment.
+
+See [006 handoff](../specs/006-section-creation-artwork/handoff.md).

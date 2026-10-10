@@ -6,7 +6,7 @@ paths through the gateway; development uses `http://localhost:3007` directly. No
 
 | Method and service path | Request | Actual service return | Declared access |
 | --- | --- | --- | --- |
-| POST /navigation/section/create-section | `{ sectionTitle, sectionDescription? }` (title trimmed, 1–120 chars; description string) | SectionDto, HTTP 201 | Admin |
+| POST /navigation/section/create-section | `{ sectionTitle, sectionDescription?, menuSvgPath?, headerSvgPath? }` (title trimmed, 1–120 chars; optional fields are strings) | SectionDto, HTTP 201 | Admin |
 | GET /navigation/sections | none | `{ sections: Record<string, SectionDto> }` | Public |
 | GET /navigation/section/:id | Section key in path | SectionDto, HTTP 200; 404 if missing | Public |
 | PATCH /navigation/section/:id | UpdateSectionDto: optional sectionTitle, sectionDescription, numeric summary, menuSvgPath, headerSvgPath; at least one required | SectionDto, HTTP 200; server timestamp refreshed; 400 for invalid input, 404 if missing | Admin |
@@ -43,7 +43,10 @@ Nest's default POST status is 201 even where Swagger advertises ApiOkResponse.
   in responses. Creation defaults it to ''; legacy records without it also return
   ''. Updates preserve it when omitted and accept '' to clear it. Whitespace and
   multiline descriptions are preserved, with no new length limit. Nulls and
-  non-string descriptions return 400. Numeric summary remains unchanged.
+  non-string descriptions return 400. Creation also accepts optional SVG path
+  strings, persists supplied paths and defaults omitted paths to empty strings.
+  Empty path strings are valid; null/non-string paths return 400. Numeric summary
+  remains unchanged.
   Deletion never cascades to workshops/pages. Its existence check does not
   serialize concurrent workshop creation; cross-operation coordination remains
   a separate integrity requirement.

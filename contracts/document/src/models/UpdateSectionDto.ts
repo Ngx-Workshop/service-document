@@ -11,8 +11,8 @@ export type UpdateSectionDto = {
      * Description of the section; an empty string clears it
      */
     sectionDescription?: string;
-    summary?: number;
     menuSvgPath?: string;
     headerSvgPath?: string;
+    summary?: number;
 };
 

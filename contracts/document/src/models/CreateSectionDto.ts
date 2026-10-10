@@ -11,5 +11,7 @@ export type CreateSectionDto = {
      * Description of the section; an empty string clears it
      */
     sectionDescription?: string;
+    menuSvgPath?: string;
+    headerSvgPath?: string;
 };
 

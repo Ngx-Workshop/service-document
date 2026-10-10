@@ -343,15 +343,17 @@ export interface components {
             sectionTitle: string;
             /** @description Description of the section; an empty string clears it */
             sectionDescription?: string;
+            menuSvgPath?: string;
+            headerSvgPath?: string;
         };
         UpdateSectionDto: {
             /** @description Display name of the section */
             sectionTitle?: string;
             /** @description Description of the section; an empty string clears it */
             sectionDescription?: string;
-            summary?: number;
             menuSvgPath?: string;
             headerSvgPath?: string;
+            summary?: number;
         };
         DeleteResultDto: {
             acknowledged: boolean;

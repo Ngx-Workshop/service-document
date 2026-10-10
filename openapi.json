@@ -782,6 +782,12 @@
           "sectionDescription": {
             "type": "string",
             "description": "Description of the section; an empty string clears it"
+          },
+          "menuSvgPath": {
+            "type": "string"
+          },
+          "headerSvgPath": {
+            "type": "string"
           }
         },
         "required": [
@@ -801,14 +807,14 @@
             "type": "string",
             "description": "Description of the section; an empty string clears it"
           },
-          "summary": {
-            "type": "number"
-          },
           "menuSvgPath": {
             "type": "string"
           },
           "headerSvgPath": {
             "type": "string"
+          },
+          "summary": {
+            "type": "number"
           }
         }
       },

@@ -102,7 +102,51 @@ describe('Section creation HTTP contract', () => {
     expect(persistence.create).toHaveBeenCalledWith({
       sectionTitle: 'TypeScript',
       sectionDescription: undefined,
+      menuSvgPath: undefined,
+      headerSvgPath: undefined,
     });
+  });
+  it.each([
+    { sectionDescription: '', menuSvgPath: '', headerSvgPath: '' },
+    { menuSvgPath: '/menu.svg' },
+    { headerSvgPath: '/header.svg' },
+    { menuSvgPath: '/menu.svg', headerSvgPath: '/header.svg' },
+  ])(
+    'persists optional artwork and exposes it in public reads: %j',
+    async (fields) => {
+      const response: { body: SectionDto } = await request(app.getHttpServer())
+        .post('/navigation/section/create-section')
+        .set('x-test-role', Role.Admin)
+        .send({ sectionTitle: 'Rust', ...fields })
+        .expect(201);
+      const expected = {
+        sectionTitle: 'Rust',
+        sectionDescription: '',
+        menuSvgPath: fields.menuSvgPath ?? '',
+        headerSvgPath: fields.headerSvgPath ?? '',
+      };
+      expect(response.body).toMatchObject(expected);
+      expect(records[0]).toMatchObject(expected);
+      const list: { body: SectionsMapDto } = await request(app.getHttpServer())
+        .get('/navigation/sections')
+        .expect(200);
+      expect(list.body.sections[response.body._id]).toMatchObject(expected);
+    }
+  );
+  it.each(
+    ['menuSvgPath', 'headerSvgPath'].flatMap((field) =>
+      [null, 123, false, [], {}].map((value) => ({
+        sectionTitle: 'Rust',
+        [field]: value,
+      }))
+    )
+  )('rejects invalid artwork without persistence: %j', async (body) => {
+    await request(app.getHttpServer())
+      .post('/navigation/section/create-section')
+      .set('x-test-role', Role.Admin)
+      .send(body)
+      .expect(400);
+    expect(persistence.create).not.toHaveBeenCalled();
   });
   it.each(['A section description', '', '  First line\nSecond line  '])(
     'persists and lists the description verbatim: %j',
