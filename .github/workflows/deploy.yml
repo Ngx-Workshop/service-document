@@ -223,7 +223,7 @@ jobs:
               --name document \
               --env-file .env \
               --network ngx-net \
-              --restart unless-stopped \
+              --restart unless-stopped --log-driver json-file --log-opt max-size=10m --log-opt max-file=3 \
               -p 3007:3007 \
               document
 

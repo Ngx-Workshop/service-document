@@ -13,3 +13,5 @@ Follow the local [workflow](../.specify/README.md).
 | 007 Workshop level | Implemented and locally verified | [Spec](007-workshop-level/spec.md), [plan](007-workshop-level/plan.md), [tasks](007-workshop-level/tasks.md), [handoff](007-workshop-level/handoff.md) |
 
 - [008-deployment-cleanup](008-deployment-cleanup/spec.md): Deployment cleanup; implemented and locally verified.
+
+- [009-service-observability](009-service-observability/spec.md): Implemented and locally verified; Grafana ingestion authorization pending.

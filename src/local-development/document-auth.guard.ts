@@ -1,3 +1,4 @@
+import { isHeartbeatContext } from '../observability/health.controller';
 import {
   CanActivate,
   ExecutionContext,
@@ -31,6 +32,7 @@ export class DocumentAuthGuard implements CanActivate {
   constructor(private readonly authentication: AuthenticationGuard) {}
 
   canActivate(context: ExecutionContext) {
+    if (isHeartbeatContext(context)) return true;
     if (!localMode()) return this.authentication.canActivate(context);
     assertLocalDatabase();
     const request = context.switchToHttp().getRequest<Request>();
