@@ -205,3 +205,7 @@ See [006 handoff](../specs/006-section-creation-artwork/handoff.md).
 153 service tests and 28 focused ChromeHeadless workshop-authoring tests passed. Service production build, OpenAPI regeneration, generated contract compilation and editor production build passed. Whitespace checks passed.
 No live MongoDB/gateway/hosted UI checks, publication or deployment.
 See [handoff](../specs/007-workshop-level/handoff.md).
+
+## Deployment storage policy
+
+See [deployment cleanup](deployment-cleanup.md) for success-only image/container retention and local verification.

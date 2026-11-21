@@ -11,3 +11,5 @@ Follow the local [workflow](../.specify/README.md).
 | 005 Mixed workshop journey | Implemented; frontend integration pending | [Spec](005-mixed-workshop-journey/spec.md), [plan](005-mixed-workshop-journey/plan.md), [tasks](005-mixed-workshop-journey/tasks.md), [handoff](005-mixed-workshop-journey/handoff.md) |
 | 006 Optional section creation artwork | Implemented; hosted integration pending | [Spec](006-section-creation-artwork/spec.md), [plan](006-section-creation-artwork/plan.md), [tasks](006-section-creation-artwork/tasks.md), [handoff](006-section-creation-artwork/handoff.md) |
 | 007 Workshop level | Implemented and locally verified | [Spec](007-workshop-level/spec.md), [plan](007-workshop-level/plan.md), [tasks](007-workshop-level/tasks.md), [handoff](007-workshop-level/handoff.md) |
+
+- [008-deployment-cleanup](008-deployment-cleanup/spec.md): Deployment cleanup; implemented and locally verified.
