@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { NavigationModule } from './navigation/navigation.module';
 import { WorkshopModule } from './workshop-page/workshop-page.module';
+import { DocumentAuthModule } from './local-development/document-auth.module';
 
 const DB_IMPORTS =
   process.env.GENERATE_OPENAPI === 'true'
@@ -11,7 +12,7 @@ const DB_IMPORTS =
     : [
         MongooseModule.forRootAsync({
           inject: [ConfigService],
-          useFactory: async (config: ConfigService) => ({
+          useFactory: (config: ConfigService) => ({
             uri: config.get<string>('MONGODB_URI'),
             serverSelectionTimeoutMS: 5000, // Timeout in 5 seconds
           }),
@@ -21,6 +22,7 @@ const DB_IMPORTS =
 @Module({
   imports: [
     ObservabilityModule,
+    DocumentAuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

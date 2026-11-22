@@ -1,6 +1,51 @@
-import { ConsoleLogger, INestApplication, Logger } from '@nestjs/common';
+import {
+  ConsoleLogger,
+  HttpException,
+  INestApplication,
+  Logger,
+} from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 import { randomUUID } from 'node:crypto';
+import { AsyncLocalStorage } from 'node:async_hooks';
+
+const requests = new AsyncLocalStorage<{ requestId: string }>();
+
+type DomainEvent =
+  | 'page_content_saved'
+  | 'navigation_page_created'
+  | 'navigation_reference_added'
+  | 'navigation_journey_reordered';
+
+export async function observeDomainOperation<T>(
+  logger: Pick<Logger, 'log' | 'warn' | 'error'>,
+  event: DomainEvent,
+  operation: () => Promise<T>
+): Promise<T> {
+  const operationId = randomUUID();
+  const requestId = requests.getStore()?.requestId;
+  const started = process.hrtime.bigint();
+  const entry = () => ({
+    event,
+    operationId,
+    ...(requestId ? { requestId } : {}),
+    durationMs: Math.round(Number(process.hrtime.bigint() - started) / 1e6),
+  });
+  try {
+    const result = await operation();
+    logger.log({ ...entry(), outcome: 'succeeded' });
+    return result;
+  } catch (error: unknown) {
+    const statusCode = error instanceof HttpException ? error.getStatus() : 500;
+    const payload = {
+      ...entry(),
+      outcome: statusCode < 500 ? 'rejected' : 'failed',
+      statusCode,
+    };
+    if (statusCode < 500) logger.warn(payload);
+    else logger.error(payload);
+    throw error;
+  }
+}
 
 export function createServiceLogger(): ConsoleLogger {
   return new ConsoleLogger({
@@ -10,7 +55,9 @@ export function createServiceLogger(): ConsoleLogger {
   });
 }
 
-export function httpLoggingMiddleware(logger = new Logger('HTTP')) {
+export function httpLoggingMiddleware(
+  logger: Pick<Logger, 'log' | 'warn' | 'error'> = new Logger('HTTP')
+) {
   return (request: Request, response: Response, next: NextFunction): void => {
     // Heartbeats are represented by probe metrics, not repetitive access logs.
     if (
@@ -38,7 +85,7 @@ export function httpLoggingMiddleware(logger = new Logger('HTTP')) {
       else if (entry.statusCode >= 400) logger.warn(entry);
       else logger.log(entry);
     });
-    next();
+    requests.run({ requestId }, next);
   };
 }
 

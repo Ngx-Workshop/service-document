@@ -66,7 +66,9 @@ external ngx-net network; it does not supply MongoDB or the auth service.
 | npm run contracts:document:build | Compile generated package |
 | npm test -- --runInBand | Jest suite; section CRUD HTTP/guard/validation and local auth checks |
 | npm run test:e2e -- --runInBand | Inherited root-route test; not representative of document API |
-| ./node_modules/.bin/eslint 'src/**/*.ts' 'test/**/*.ts' | Read-only lint check; npm run lint applies fixes |
+| npm run lint:check | Read-only lint gate with explicit inherited ESLint suppression baseline; npm run lint applies fixes |
+| npm run format:check | Read-only supported-code/config formatting gate; generated artifacts and historical prose/Compose excluded |
+| npm run test:maintenance | Six disposable Git/hook/negative-gate and offline clean-install checks; uses local npm cache |
 | ./node_modules/.bin/tsc --noEmit --incremental false -p tsconfig.build.json | Read-only service typecheck |
 | ./node_modules/.bin/tsc --noEmit -p contracts/document/tsconfig.build.json | Read-only contract typecheck |
 
@@ -162,6 +164,49 @@ tool did not discover these Jest files; the repository Jest runner was used.
 
 See [section description handoff](../specs/004-section-description/handoff.md)
 for exact consumer delivery order and verification limits.
+
+## Code Maintenance - 2026-11-22
+
+`npm ci` installs pinned Husky 9.1.7/lint-staged 16.2.7 and enables local hooks.
+Pre-commit invokes the installed binary (no network fallback) and runs Prettier
+only on staged TS/JS/CJS/MJS/JSON/YAML files. Keep lint-staged's default stash and
+partial-staging behavior; do not pass `--no-stash` or `--no-hide-partially-staged`.
+Invalid syntax blocks commits and restores original staged/unstaged changes.
+
+The manifest's self-contained prepare skips CI, HUSKY=0, production, omitted dev
+dependencies and absent .git. It does not need a script copied before Docker's
+package-only `npm ci`, and real developer installation errors remain fatal.
+Generated contracts/OpenAPI/lockfiles, output, vendored dependencies and historical
+prose are excluded in .prettierignore. Existing docker-compose.yml formatting
+drift is explicitly excluded rather than incidentally rewritten.
+
+ESLint 9 bulk suppressions record only 13 inherited errors in main.ts,
+section-creation.spec.ts, workshop-level.spec.ts and swagger.ts. Rules remain
+enabled: new files/rules or increased per-file/rule counts fail the gate. This is
+a count baseline, not a line-specific guarantee; replace/prune entries as those
+areas are intentionally repaired. Fourteen inherited warnings remain visible.
+To inspect raw debt without changing files, use
+`./node_modules/.bin/eslint 'src/**/*.ts' 'test/**/*.ts' --suppressions-location /tmp/document-no-suppressions.json`
+with a nonexistent location. Do not refresh the baseline to hide new errors.
+
+The PR/main checks workflow runs locked install, formatting, lint, Jest,
+maintenance fixtures, build and direct typecheck without publication/deployment.
+Publishing also runs format/lint/Jest before generating/publishing contracts.
+No workflow has been remotely executed by this task.
+
+Local verification: 176 Jest tests, six maintenance fixtures, build, direct
+service typecheck, format gate and baselined lint pass. The invalid TypeScript
+deleteOutDir option was removed; Nest retains it in nest-cli.json.
+The existing isolated MongoDB journey check passed and removed its dedicated
+database. Developer, CI, package-only/no-Git and production/no-dev `npm ci`
+fixtures passed on macOS/Node 24.9.0; Linux-targeted dependency dry run passed.
+Actual Docker execution is unavailable (daemon not running); Node 22 CI,
+external auth/gateway and live Grafana receipt remain separate checks.
+Production-only installation success does not certify startup: the existing
+runtime auth client is still declared as a devDependency.
+
+See [handoff](../specs/010-code-maintenance/handoff.md) for exact evidence,
+transient check failures and external-owner next steps.
 
 ## Mixed workshop journey verification — 2026-10-05
 

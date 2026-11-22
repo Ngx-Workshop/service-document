@@ -30,3 +30,15 @@ All context below is local; sibling checkouts are not required.
   publish packages or deploy merely to validate documentation.
 
 This is a repository-local Markdown workflow inspired by Spec Kit.
+
+## Next task: Code Maintenance
+
+The selected work is [Code Maintenance](specs/010-code-maintenance/spec.md)
+(Implemented and locally verified; integration pending).
+Read its [plan](specs/010-code-maintenance/plan.md), [tasks](specs/010-code-maintenance/tasks.md) and
+[handoff](specs/010-code-maintenance/handoff.md). Local T001–T010 evidence is recorded; retain older unfinished
+feature records without treating them as the next task. The requested work covers
+NestJS module/domain boundaries, thin controllers, cohesive services, Prettier
+with Husky/lint-staged, CI checks and safe domain logging through existing
+observability. Follow the handoff for pending Node 22/Docker/Grafana checks;
+do not repeat the audit or treat older unfinished features as newly authorized.

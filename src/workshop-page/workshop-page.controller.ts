@@ -1,5 +1,5 @@
-import { DocumentAuthGuard } from '../local-development/document-auth.guard';
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseFilters } from '@nestjs/common';
+import { DomainExceptionFilter } from '../observability/domain-exception.filter';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { Auth, Role, Roles } from '@tmdjr/ngx-auth-client';
 import { AuthType } from '@tmdjr/ngx-auth-client/enums/auth-type.enum';
@@ -16,7 +16,6 @@ export class WorkshopController {
   }
 
   @Get('workshops')
-  @UseGuards(DocumentAuthGuard)
   @ApiOkResponse({ type: WorkshopPageDto, isArray: true })
   workshops() {
     return this.workshopService.findAll();
@@ -25,12 +24,13 @@ export class WorkshopController {
   @Auth(AuthType.None)
   @Get(':objectId')
   @ApiOkResponse({ type: WorkshopPageDto })
-  workshop(@Param('objectId') objectId) {
+  workshop(@Param() { objectId }: { objectId: string }) {
     return this.workshopService.getWorkshop(objectId);
   }
 
   @Roles(Role.Admin)
   @Post('update-workshop-html')
+  @UseFilters(DomainExceptionFilter)
   @ApiOkResponse({ type: WorkshopPageDto })
   async updateWorkshopHtml(
     @Body() { html, _id }: { html: string; _id: string }

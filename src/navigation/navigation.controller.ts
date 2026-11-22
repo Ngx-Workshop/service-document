@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   ParseArrayPipe,
+  UseFilters,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
@@ -37,6 +38,7 @@ import {
 } from './dto/create.dto';
 import { UpdateSectionDto, UpdateWorkshopDto } from './dto/update.dto';
 import { NavigationService } from './navigation.service';
+import { DomainExceptionFilter } from '../observability/domain-exception.filter';
 import {
   AddWorkshopReferenceDto,
   AssessmentTestIdentifierDto,
@@ -136,6 +138,7 @@ export class NavigationController {
   }
 
   @Post('page/create-page')
+  @UseFilters(DomainExceptionFilter)
   @Roles(Role.Admin)
   @ApiCreatedResponse({ type: WorkshopDto })
   async createPage(
@@ -146,6 +149,7 @@ export class NavigationController {
   }
 
   @Post('page/add-reference')
+  @UseFilters(DomainExceptionFilter)
   @Roles(Role.Admin)
   @ApiCreatedResponse({ type: WorkshopDto })
   @ApiBadRequestResponse({ description: 'Invalid reference' })
@@ -178,6 +182,7 @@ export class NavigationController {
 
   @Roles(Role.Admin)
   @Post('page/sort-pages')
+  @UseFilters(DomainExceptionFilter)
   @ApiCreatedResponse({ type: WorkshopDto })
   @ApiBadRequestResponse({ description: 'Invalid journey permutation' })
   @ApiNotFoundResponse({ description: 'Workshop not found' })

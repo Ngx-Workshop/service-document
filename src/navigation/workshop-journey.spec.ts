@@ -1,6 +1,7 @@
 import {
   ExecutionContext,
   INestApplication,
+  Logger,
   ValidationPipe,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
@@ -321,6 +322,73 @@ describe('Mixed workshop journey', () => {
       'Append failed'
     );
     expect(documents.deleteOne).toHaveBeenCalledWith(pageId);
+  });
+  it('logs safe reference success and reorder conflict outcomes without entry metadata', async () => {
+    const log = jest
+      .spyOn(Logger.prototype, 'log')
+      .mockImplementation(() => {});
+    const warn = jest
+      .spyOn(Logger.prototype, 'warn')
+      .mockImplementation(() => {});
+    try {
+      await service.addReference({
+        ...reference,
+        kind: 'ASSESSMENT_TEST',
+        name: 'private-name-canary',
+        resourceId: 'private-resource-canary',
+      });
+      workshops.findOneAndUpdate.mockResolvedValue(null);
+      await expect(service.sortPages(items, id)).rejects.toThrow(
+        'Workshop journey changed'
+      );
+      expect(log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event: 'navigation_reference_added',
+          outcome: 'succeeded',
+        })
+      );
+      expect(warn).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event: 'navigation_journey_reordered',
+          outcome: 'rejected',
+          statusCode: 409,
+        })
+      );
+      expect(JSON.stringify([log.mock.calls, warn.mock.calls])).not.toMatch(
+        /private-|507f1f77/
+      );
+    } finally {
+      log.mockRestore();
+      warn.mockRestore();
+    }
+  });
+  it('emits a single failed page-creation outcome after compensation without dumping the storage error', async () => {
+    const error = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation(() => {});
+    try {
+      const failure = new Error('private-storage-canary');
+      documents.createWorkshopDocument.mockResolvedValue({
+        _id: pageId,
+        name: 'private-page-canary',
+      });
+      workshops.findByIdAndUpdate.mockRejectedValue(failure);
+      await expect(service.createPage({ workshopId: id })).rejects.toBe(
+        failure
+      );
+      expect(documents.deleteOne).toHaveBeenCalledWith(pageId);
+      expect(error).toHaveBeenCalledTimes(1);
+      expect(error).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event: 'navigation_page_created',
+          outcome: 'failed',
+          statusCode: 500,
+        })
+      );
+      expect(JSON.stringify(error.mock.calls)).not.toMatch(/private-|507f1f77/);
+    } finally {
+      error.mockRestore();
+    }
   });
   it('defaults untyped existing document references to PAGE, never CODING_LAB', async () => {
     const record = parent();

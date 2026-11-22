@@ -19,7 +19,8 @@ TypeScript is ~5.7.3 with strictNullChecks but noImplicitAny disabled.
 | Metadata | src/navigation/dto/, schemas/ | Request/response DTOs, Section and Workshop schemas |
 | Page content | src/workshop-page/workshop-page.controller.ts, workshop-page.service.ts | Page reads, content saves and persistence helpers |
 | Page schema | src/workshop-page/dto/, schemas/ | Page payloads and JSON block defaults |
-| Auth wiring | Feature module files | DocumentAuthGuard wrapper, RolesGuard and generation-only providers |
+| Auth wiring | src/local-development/document-auth.module.ts, document-auth.guard.ts | One global authentication/roles registration; loopback-only local wrapper |
+| Observability | src/observability/ | JSON HTTP/domain outcomes, request context, safe instrumented-route failures and liveness |
 | Contracts | src/swagger.ts, openapi.json, contracts/document/ | Schema generation and publishable types |
 | Operations | Dockerfile, docker-compose.yml, .github/workflows/deploy.yml | Build, contract publication and deployment |
 
@@ -57,11 +58,21 @@ consequences and verification needs rather than claiming atomicity.
 
 ## API, authentication and validation
 
-See [HTTP contracts](api-contracts.md). Both modules register global auth/role
-guards. DocumentAuthGuard delegates to AuthenticationGuard normally; explicit local
+See [HTTP contracts](api-contracts.md). DocumentAuthModule registers global auth/role
+guards once. DocumentAuthGuard delegates to AuthenticationGuard normally; explicit local
 mode is restricted to loopback/document_local and injects a synthetic admin. Sections, workshop lists and individual page reads explicitly allow public
 access; writes require Admin. Health is not explicitly public. The listing of all
-pages also applies DocumentAuthGuard. External auth integration is not verified here.
+pages remains protected by the global DocumentAuthGuard. External auth integration is not verified here.
+
+NavigationModule imports WorkshopModule instead of registering page persistence
+again. WorkshopModule owns the WorkshopPage model and exports only
+WorkshopDocumentService; navigation owns Section/Workshop models and coordinates
+journey writes. DocumentAuthModule imports the auth client's own HTTP adapter
+wiring and exports no providers. Dependencies are acyclic. Controllers retain
+their transport metadata/delegation and existing authorization/response behavior.
+The private page-update helper preserves rename before-images, content-save
+after-images, duplicate-key conflicts and untouched timestamps/block text.
+See [maintenance audit](../specs/010-code-maintenance/audit.md).
 
 ValidationPipe uses whitelist and forbidNonWhitelisted, but that does not validate
 inline object bodies or array elements automatically. Transformation is not globally

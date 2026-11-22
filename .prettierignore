@@ -1,0 +1,18 @@
+node_modules/
+dist/
+build/
+coverage/
+contracts/
+openapi.json
+package-lock.json
+eslint-suppressions.json
+.husky/_/
+.vscode/
+.specify/
+# Historical prose and unsupported languages are not part of the code-style gate.
+**/*.md
+**/*.py
+Dockerfile
+# Existing Compose formatting drift is outside this maintenance scope.
+docker-compose.yml
+.env*

@@ -50,6 +50,9 @@ jobs:
           GENERATE_OPENAPI: 'true'
         run: |
           npm ci
+          npm run format:check
+          npm run lint:check
+          GENERATE_OPENAPI=false npm test -- --runInBand
           npm run build
           npm run openapi
 

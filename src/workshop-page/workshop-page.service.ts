@@ -2,18 +2,20 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, isValidObjectId } from 'mongoose';
-import { WorkshopPageIdentifierDto } from './dto/create.dto';
+import { Model, Types, isValidObjectId } from 'mongoose';
 import {
   TWorkshopPageDocument,
   WorkshopPage,
 } from './schemas/workshop-page.schema';
+import { observeDomainOperation } from '../observability/observability';
 
 @Injectable()
 export class WorkshopDocumentService {
+  private readonly logger = new Logger(WorkshopDocumentService.name);
   constructor(
     @InjectModel(WorkshopPage.name)
     private workshopDocumentModel: Model<TWorkshopPageDocument>
@@ -56,7 +58,7 @@ export class WorkshopDocumentService {
 
   async createWorkshopDocument(
     workshop: Partial<WorkshopPage>
-  ): Promise<WorkshopPage> {
+  ): Promise<TWorkshopPageDocument> {
     if (!workshop.workshopGroupId) {
       throw new BadRequestException('workshopGroupId is required');
     }
@@ -69,7 +71,7 @@ export class WorkshopDocumentService {
   }
 
   async deleteMany(
-    workshopDocuments: WorkshopPage[] | WorkshopPageIdentifierDto[]
+    workshopDocuments: readonly { _id: string | Types.ObjectId }[]
   ) {
     return await this.workshopDocumentModel.deleteMany({
       _id: { $in: workshopDocuments.map((document) => document._id) },
@@ -82,34 +84,24 @@ export class WorkshopDocumentService {
   }
 
   async updateWorkshopName(id: string, name: string): Promise<WorkshopPage> {
-    this.ensureValidObjectId(id);
-    try {
-      const updateWorkshopDocument = await this.workshopDocumentModel
-        .findByIdAndUpdate(id, { name }, { returnDocument: 'before' })
-        .exec();
-
-      if (!updateWorkshopDocument) {
-        throw new NotFoundException(
-          `WorkshopDocument with ID "${id}" not found`
-        );
-      }
-
-      return updateWorkshopDocument;
-    } catch (error) {
-      if (error.code === 11000) {
-        throw new ConflictException(
-          'WorkshopDocument with this name already exists'
-        );
-      }
-      throw error;
-    }
+    return this.updatePage(id, { name }, 'before');
   }
 
-  async updateWorkshopHtml(id: any, html: string): Promise<WorkshopPage> {
+  async updateWorkshopHtml(id: string, html: string): Promise<WorkshopPage> {
+    return observeDomainOperation(this.logger, 'page_content_saved', () =>
+      this.updatePage(id, { html }, 'after')
+    );
+  }
+
+  private async updatePage(
+    id: string,
+    changes: Pick<WorkshopPage, 'name'> | Pick<WorkshopPage, 'html'>,
+    returnDocument: 'before' | 'after'
+  ): Promise<WorkshopPage> {
     this.ensureValidObjectId(id);
     try {
       const updateWorkshopDocument = await this.workshopDocumentModel
-        .findByIdAndUpdate(id, { html }, { returnDocument: 'after' })
+        .findByIdAndUpdate(id, changes, { returnDocument })
         .exec();
 
       if (!updateWorkshopDocument) {
@@ -119,8 +111,13 @@ export class WorkshopDocumentService {
       }
 
       return updateWorkshopDocument;
-    } catch (error) {
-      if (error.code === 11000) {
+    } catch (error: unknown) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        error.code === 11000
+      ) {
         throw new ConflictException(
           'WorkshopDocument with this name already exists'
         );

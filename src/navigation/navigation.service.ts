@@ -9,8 +9,8 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
-import { WorkshopPage } from '../workshop-page/schemas/workshop-page.schema';
 import { WorkshopDocumentService } from '../workshop-page/workshop-page.service';
+import { observeDomainOperation } from '../observability/observability';
 
 import {
   CreateWorkshopPageDto,
@@ -43,7 +43,7 @@ import {
 
 @Injectable()
 export class NavigationService {
-  private logger = new Logger();
+  private readonly logger = new Logger(NavigationService.name);
 
   constructor(
     @InjectModel(Section.name) private sectionModel: Model<SectionDocumentDoc>,
@@ -184,7 +184,7 @@ export class NavigationService {
       await this.workshopDocumentService.createWorkshopDocument({
         workshopGroupId: newWorkshop._id,
       });
-    const workshopDocumentId = this.toWorkshopDocumentId(workshopDocument);
+    const workshopDocumentId = workshopDocument._id.toString();
 
     const updatedWorkshop = await this.workshopModel.findByIdAndUpdate(
       newWorkshop._id,
@@ -276,33 +276,40 @@ export class NavigationService {
   }
 
   async createPage(page: CreateWorkshopPageDto): Promise<WorkshopDto> {
-    const { lastUpdated, workshopId, ...rest } = page;
-    const parent = await this.workshopModel.findById(workshopId);
-    if (!parent) throw new NotFoundException('Workshop not found');
-    const workshop = await this.workshopDocumentService.createWorkshopDocument({
-      ...rest,
-      workshopGroupId: new Types.ObjectId(workshopId),
-      lastUpdated: lastUpdated ? new Date(lastUpdated) : undefined,
-    });
-    const workshopDocumentId = this.toWorkshopDocumentId(workshop);
-    let updatedWorkshop: TWorkshopDocument | null;
-    try {
-      updatedWorkshop = await this.appendJourneyItem(workshopId, {
-        _id: workshopDocumentId,
-        kind: 'PAGE',
-        name: workshop.name,
-        sortId: 0,
-      });
-    } catch (error) {
-      await this.workshopDocumentService.deleteOne(workshopDocumentId);
-      throw error;
-    }
-    if (!updatedWorkshop) {
-      await this.workshopDocumentService.deleteOne(workshopDocumentId);
-      throw new NotFoundException('Workshop not found when adding page');
-    }
+    return observeDomainOperation(
+      this.logger,
+      'navigation_page_created',
+      async () => {
+        const { lastUpdated, workshopId, ...rest } = page;
+        const parent = await this.workshopModel.findById(workshopId);
+        if (!parent) throw new NotFoundException('Workshop not found');
+        const workshop =
+          await this.workshopDocumentService.createWorkshopDocument({
+            ...rest,
+            workshopGroupId: new Types.ObjectId(workshopId),
+            lastUpdated: lastUpdated ? new Date(lastUpdated) : undefined,
+          });
+        const workshopDocumentId = workshop._id.toString();
+        let updatedWorkshop: TWorkshopDocument | null;
+        try {
+          updatedWorkshop = await this.appendJourneyItem(workshopId, {
+            _id: workshopDocumentId,
+            kind: 'PAGE',
+            name: workshop.name,
+            sortId: 0,
+          });
+        } catch (error) {
+          await this.workshopDocumentService.deleteOne(workshopDocumentId);
+          throw error;
+        }
+        if (!updatedWorkshop) {
+          await this.workshopDocumentService.deleteOne(workshopDocumentId);
+          throw new NotFoundException('Workshop not found when adding page');
+        }
 
-    return this.toWorkshopDto(updatedWorkshop);
+        return this.toWorkshopDto(updatedWorkshop);
+      }
+    );
   }
 
   async deletePageAndUpdateWorkshop(
@@ -363,15 +370,21 @@ export class NavigationService {
   }
 
   async addReference(input: AddWorkshopReferenceDto): Promise<WorkshopDto> {
-    const updated = await this.appendJourneyItem(input.workshopId, {
-      _id: new Types.ObjectId().toString(),
-      kind: input.kind,
-      name: input.name,
-      resourceId: input.resourceId,
-      sortId: 0,
-    });
-    if (!updated) throw new NotFoundException('Workshop not found');
-    return this.toWorkshopDto(updated);
+    return observeDomainOperation(
+      this.logger,
+      'navigation_reference_added',
+      async () => {
+        const updated = await this.appendJourneyItem(input.workshopId, {
+          _id: new Types.ObjectId().toString(),
+          kind: input.kind,
+          name: input.name,
+          resourceId: input.resourceId,
+          sortId: 0,
+        });
+        if (!updated) throw new NotFoundException('Workshop not found');
+        return this.toWorkshopDto(updated);
+      }
+    );
   }
 
   private appendJourneyItem(workshopId: string, item: WorkshopJourneyItem) {
@@ -418,67 +431,77 @@ export class NavigationService {
     pages: WorkshopJourneyItem[],
     workshopId: string
   ): Promise<WorkshopDto> {
-    if (!Types.ObjectId.isValid(workshopId))
-      throw new BadRequestException('Invalid workshop ID');
-    if (!Array.isArray(pages))
-      throw new BadRequestException('Expected an array of journey entries');
-    for (const item of pages) {
-      if (!item || typeof item !== 'object')
-        throw new BadRequestException('Invalid journey entry');
-      const dto =
-        item.kind === 'PAGE'
-          ? plainToInstance(WorkshopPageIdentifierDto, item)
-          : item.kind === 'ASSESSMENT_TEST'
-            ? plainToInstance(AssessmentTestIdentifierDto, item)
-            : item.kind === 'CODING_LAB'
-              ? plainToInstance(CodingLabIdentifierDto, item)
-              : null;
-      if (
-        !dto ||
-        (await validate(dto, { whitelist: true, forbidNonWhitelisted: true }))
-          .length
-      ) {
-        throw new BadRequestException('Invalid journey entry');
+    return observeDomainOperation(
+      this.logger,
+      'navigation_journey_reordered',
+      async () => {
+        if (!Types.ObjectId.isValid(workshopId))
+          throw new BadRequestException('Invalid workshop ID');
+        if (!Array.isArray(pages))
+          throw new BadRequestException('Expected an array of journey entries');
+        for (const item of pages) {
+          if (!item || typeof item !== 'object')
+            throw new BadRequestException('Invalid journey entry');
+          const dto =
+            item.kind === 'PAGE'
+              ? plainToInstance(WorkshopPageIdentifierDto, item)
+              : item.kind === 'ASSESSMENT_TEST'
+                ? plainToInstance(AssessmentTestIdentifierDto, item)
+                : item.kind === 'CODING_LAB'
+                  ? plainToInstance(CodingLabIdentifierDto, item)
+                  : null;
+          if (
+            !dto ||
+            (
+              await validate(dto, {
+                whitelist: true,
+                forbidNonWhitelisted: true,
+              })
+            ).length
+          ) {
+            throw new BadRequestException('Invalid journey entry');
+          }
+        }
+        const existing = await this.workshopModel.findById(workshopId);
+        if (!existing) throw new NotFoundException('Workshop not found');
+        const byId = new Map(
+          existing.workshopDocuments.map((item) => [item._id, item])
+        );
+        if (
+          pages.length !== byId.size ||
+          new Set(pages.map((item) => item?._id)).size !== byId.size ||
+          pages.some((item) => !item || !byId.has(item._id))
+        ) {
+          throw new BadRequestException(
+            'Reorder must contain every existing entry exactly once'
+          );
+        }
+        const ordered = pages.map((item, sortId) => ({
+          ...this.toJourneyItem(byId.get(item._id)!),
+          sortId,
+        }));
+        const updatedWorkshop = await this.workshopModel.findOneAndUpdate(
+          {
+            _id: workshopId,
+            __v: existing.__v,
+          },
+          {
+            workshopDocuments: ordered,
+            workshopDocumentsLastUpdated: new Date(),
+            $inc: { __v: 1 },
+          },
+          { returnDocument: 'after' }
+        );
+
+        if (!updatedWorkshop) {
+          throw new ConflictException(
+            'Workshop journey changed; reload before reordering'
+          );
+        }
+
+        return this.toWorkshopDto(updatedWorkshop);
       }
-    }
-    const existing = await this.workshopModel.findById(workshopId);
-    if (!existing) throw new NotFoundException('Workshop not found');
-    const byId = new Map(
-      existing.workshopDocuments.map((item) => [item._id, item])
     );
-    if (
-      pages.length !== byId.size ||
-      new Set(pages.map((item) => item?._id)).size !== byId.size ||
-      pages.some((item) => !item || !byId.has(item._id))
-    ) {
-      throw new BadRequestException(
-        'Reorder must contain every existing entry exactly once'
-      );
-    }
-    const ordered = pages.map((item, sortId) => ({
-      ...this.toJourneyItem(byId.get(item._id)!),
-      sortId,
-    }));
-    const updatedWorkshop = await this.workshopModel.findOneAndUpdate(
-      {
-        _id: workshopId,
-        __v: existing.__v,
-      },
-      {
-        workshopDocuments: ordered,
-        workshopDocumentsLastUpdated: new Date(),
-        $inc: { __v: 1 },
-      },
-      { returnDocument: 'after' }
-    );
-
-    if (!updatedWorkshop) {
-      throw new ConflictException(
-        'Workshop journey changed; reload before reordering'
-      );
-    }
-
-    return this.toWorkshopDto(updatedWorkshop);
   }
 
   private toWorkshopDto(workshop: TWorkshopDocument): WorkshopDto {
@@ -509,11 +532,5 @@ export class NavigationService {
     if (item.kind === 'ASSESSMENT_TEST')
       return { ...base, kind: 'ASSESSMENT_TEST', resourceId: item.resourceId };
     return { ...base, kind: 'CODING_LAB', resourceId: item.resourceId };
-  }
-
-  private toWorkshopDocumentId(
-    workshopDocument: WorkshopPage | TWorkshopDocument
-  ): string {
-    return (workshopDocument as TWorkshopDocument)._id.toString();
   }
 }
