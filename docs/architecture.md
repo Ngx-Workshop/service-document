@@ -109,3 +109,5 @@ Workshop metadata includes level (default 1, range 1–20). The service validate
 integer payloads, preserves omitted edit values and returns 1 for legacy records.
 The administrator form requires level on create/edit and loads saved values.
 See [007 handoff](../specs/007-workshop-level/handoff.md) for contract delivery order.
+
+Generated deployment orchestration is centrally managed by the Node CLI; see [deployment-workflows](deployment-workflows.md).

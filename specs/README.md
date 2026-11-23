@@ -28,3 +28,5 @@ Follow the local [workflow](../.specify/README.md).
 - [008-deployment-cleanup](008-deployment-cleanup/spec.md): Deployment cleanup; implemented and locally verified.
 
 - [009-service-observability](009-service-observability/spec.md): Implemented and locally verified; Grafana ingestion authorization pending.
+
+- [011-deployment-management](011-deployment-management/spec.md): Implemented locally; automatic verification/deployment, manual publication.

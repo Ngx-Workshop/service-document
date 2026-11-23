@@ -42,3 +42,5 @@ NestJS module/domain boundaries, thin controllers, cohesive services, Prettier
 with Husky/lint-staged, CI checks and safe domain logging through existing
 observability. Follow the handoff for pending Node 22/Docker/Grafana checks;
 do not repeat the audit or treat older unfinished features as newly authorized.
+
+Current deployment policy: [deployment-workflows](docs/deployment-workflows.md). Automatic main delivery verifies/deploys; npm publication is manual only. This supersedes older automatic-publishing instructions.
